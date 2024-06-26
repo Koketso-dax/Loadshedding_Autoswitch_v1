@@ -24,7 +24,6 @@ def create_app():
     mqtt_client_init()
 
     return app
-
+app = create_app()
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True)
