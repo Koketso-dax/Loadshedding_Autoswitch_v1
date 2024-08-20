@@ -1,11 +1,11 @@
 import paho.mqtt.client as mqtt
-from influxdb import InfluxDBClient
+from influxdb import InfluxDBClient # switch to timescaledb
 from config import Config
-from models import Device, db
+from models import Device
 
-# Initialize InfluxDB client
-influxdb_client = InfluxDBClient(host=Config.INFLUXDB_ADDRESS, port=Config.INFLUXDB_PORT)
-influxdb_client.switch_database(Config.INFLUXDB_DATABASE)
+
+influxdb_client = InfluxDBClient(host=Config.INFLUXDB_ADDRESS, port=Config.INFLUXDB_PORT) ##########################
+influxdb_client.switch_database(Config.INFLUXDB_DATABASE) ######################
 
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")

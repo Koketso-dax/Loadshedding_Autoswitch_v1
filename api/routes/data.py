@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify
-from influxdb import InfluxDBClient
+from influxdb import InfluxDBClient # change to timescale
 from config import Config
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import Device, db
+from models import Device
 
 data = Blueprint('data', __name__)
 
-influxdb_client = InfluxDBClient(host=Config.INFLUXDB_ADDRESS, port=Config.INFLUXDB_PORT)
-influxdb_client.switch_database(Config.INFLUXDB_DATABASE)
+influxdb_client = InfluxDBClient(host=Config.INFLUXDB_ADDRESS, port=Config.INFLUXDB_PORT) ####################
+influxdb_client.switch_database(Config.INFLUXDB_DATABASE) ######################
 
 @data.route('/data/<device_id>', methods=['GET'])
 @jwt_required()
