@@ -5,11 +5,12 @@ from flask_jwt_extended import JWTManager
 from routes.auth import auth
 from routes.devices import devices
 from routes.data import data
-from services.mqtt_handler import mqtt_client_init
+from services.mqtt_handler import init_mqtt_client
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.config['MQTT_BROKER'] = '127.0.0.1'
 
     db.init_app(app)
     JWTManager(app)
@@ -21,9 +22,10 @@ def create_app():
     with app.app_context():
         db.create_all()
 
-    mqtt_client_init()
+    init_mqtt_client(app)
 
     return app
+
 app = create_app()
 if __name__ == '__main__':
     app.run(debug=True)

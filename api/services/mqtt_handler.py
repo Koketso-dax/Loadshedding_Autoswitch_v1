@@ -1,40 +1,34 @@
+""" MQTT Client Module"""
 import paho.mqtt.client as mqtt
-from influxdb import InfluxDBClient # switch to timescaledb
+from models.device import Device
+from models.measurement import Measurement
+from models import db
 from config import Config
-from models import Device
-
-
-influxdb_client = InfluxDBClient(host=Config.INFLUXDB_ADDRESS, port=Config.INFLUXDB_PORT) ##########################
-influxdb_client.switch_database(Config.INFLUXDB_DATABASE) ######################
 
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
-    client.subscribe("sensor/data/#")
+    client.subscribe("devices/#")
 
 def on_message(client, userdata, msg):
-    device_id = msg.topic.split('/')[-1]
-    device = Device.query.filter_by(id=device_id).first()
-    if device:
-        data = [
-            {
-                "measurement": "sensor_data",
-                "tags": {
-                    "host": "mqtt_server",
-                    "topic": msg.topic
-                },
-                "fields": {
-                    "value": float(msg.payload.decode())
-                }
-            }
-        ]
-        influxdb_client.write_points(data)
+    device_key = msg.topic.split('/')[1]
+    device = Device.query.filter_by(device_key=device_key).first()
 
-def mqtt_client_init():
-    mqtt_client = mqtt.Client()
-    mqtt_client.on_connect = on_connect
-    mqtt_client.on_message = on_message
-    mqtt_client.connect(Config.MQTT_BROKER, Config.MQTT_PORT, 60)
-    mqtt_client.loop_start()
+    if not device:
+        print(f"Device with key {device_key} not found")
+        return
 
-if __name__ == '__main__':
-    mqtt_client_init()
+    data = msg.payload.decode('utf-8')
+    timestamp, power_measurement = data.split(',')
+    measurement = Measurement(device=device, timestamp=timestamp, power_measurement=float(power_measurement))
+    db.session.add(measurement)
+    db.session.commit()
+
+def init_mqtt_client(app):
+    """ Client init for MQTT """
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+
+    client.connect(app.config['MQTT_BROKER'],
+                   app.config['MQTT_PORT'], 60)
+    client.loop_start()

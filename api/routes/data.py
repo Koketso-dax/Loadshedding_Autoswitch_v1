@@ -1,24 +1,19 @@
 from flask import Blueprint, request, jsonify
-from influxdb import InfluxDBClient # change to timescale
-from config import Config
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import Device
+from models.device import Device
+from models.measurement import Measurement
 
 data = Blueprint('data', __name__)
-
-influxdb_client = InfluxDBClient(host=Config.INFLUXDB_ADDRESS, port=Config.INFLUXDB_PORT) ####################
-influxdb_client.switch_database(Config.INFLUXDB_DATABASE) ######################
 
 @data.route('/data/<device_id>', methods=['GET'])
 @jwt_required()
 def get_device_data(device_id):
     user_id = get_jwt_identity()
-    device = Device.query.filter_by(id=device_id, user_id=user_id).first()
-    if not device:
+    device = Device.query.get(device_id)
+
+    if not device or device.user_id != user_id:
         return jsonify({'message': 'Device not found'}), 404
 
-    query = f'SELECT * FROM sensor_data WHERE "topic" = \'sensor/data/{device_id}\''
-    result = influxdb_client.query(query)
-    data_points = list(result.get_points())
-
-    return jsonify(data_points)
+    measurements = Measurement.query.filter_by(device_id=device_id).all()
+    data = [measurement.to_dict() for measurement in measurements]
+    return jsonify(data), 200
