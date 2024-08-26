@@ -1,7 +1,6 @@
 """
     Python module for data hypertables
 """
-from flask_sqlalchemy import SQLAlchemy
 from models import db
 
 
@@ -15,4 +14,4 @@ class Measurement(db.Model):
     timestamp = db.Column(db.DateTime())
     power_measurement = db.Column(db.Float)
 
-    device = db.relationship('Device', backref='measurements')
+    device = db.relationship('Device', backref='device_measurements')

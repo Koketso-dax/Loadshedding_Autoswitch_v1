@@ -10,7 +10,7 @@ from services.mqtt_handler import init_mqtt_client
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    app.config['MQTT_BROKER'] = '127.0.0.1'
+    
 
     db.init_app(app)
     JWTManager(app)

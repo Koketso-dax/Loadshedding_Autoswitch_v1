@@ -31,7 +31,7 @@ class User(db.Model):
         return bcrypt.check_password_hash(self.password_hash, password)
     
     @staticmethod
-    def register_user(self, username, password):
+    def register_user(username, password):
         user = User(username=username, password=password)
         db.session.add(user)
         db.session.commit()

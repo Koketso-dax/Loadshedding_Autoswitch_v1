@@ -1,7 +1,6 @@
 """
     Python module for Device Table
 """
-from flask_sqlalchemy import SQLAlchemy
 from models import db
 from models.measurement import Measurement
 
@@ -16,7 +15,7 @@ class Device(db.Model):
     device_key = db.Column(db.String(128), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    user = db.relationship('User', backref='devices')
+    user = db.relationship('User', backref='user_devices')
     measurements = db.relationship('Measurement', backref='devices')
 
     def __init__(self, device_key, user):

@@ -15,7 +15,7 @@ def register():
     if User.query.filter_by(username=username).first():
         return jsonify({'message' : 'Username already exists'}), 400
 
-    user = User.register_user(username, password)
+    User.register_user(username, password)
     return jsonify({'message' : 'User created succesfully'}), 201
 
 @auth.route('/login', methods=['POST'])
