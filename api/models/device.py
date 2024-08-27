@@ -15,7 +15,7 @@ class Device(db.Model):
     device_key = db.Column(db.String(128), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    user = db.relationship('User', backref='user')
+    user = db.relationship('User', backref='users')
     measurements = db.relationship('Measurement')
 
     def __init__(self, device_key, user):
