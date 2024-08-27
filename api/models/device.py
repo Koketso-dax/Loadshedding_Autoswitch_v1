@@ -13,7 +13,7 @@ class Device(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     device_key = db.Column(db.String(128), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     user = db.relationship('User', backref='users')
     measurements = db.relationship('Measurement')
