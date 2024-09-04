@@ -3,7 +3,7 @@ import paho.mqtt.client as mqtt
 from models.device import Device
 from models.measurement import Measurement
 from models import db
-from config import Config
+
 
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
