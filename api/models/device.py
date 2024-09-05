@@ -40,3 +40,9 @@ class Device(db.Model):
     def update_device_key(self, new_device_key):
         self.device_key = new_device_key
         db.session.commit()
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'device_key': self.device_key,
+        }
