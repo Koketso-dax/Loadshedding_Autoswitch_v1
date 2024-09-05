@@ -1,39 +1,55 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Device {
   id: number;
   device_key: string;
+  password: string;
   // Add any other device properties here
 }
 
 export default function Dashboard() {
   const [devices, setDevices] = useState<Device[]>([]);
-  const [newDeviceKey, setNewDeviceKey] = useState('');
+  const [newDeviceKey, setNewDeviceKey] = useState(uuidv4());
   const [newDevicePassword, setNewDevicePassword] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchDevices = async () => {
-      const response = await axios.get('/api/devices');
-      setDevices(response.data);
-    };
 
+    const fetchDevices = async () => {
+      try {
+        const response = await axios.get('/api/devices');
+        setDevices(response.data);
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response?.status === 401) {
+          router.push('/login');
+        }
+      }
+    };
     fetchDevices();
   }, []);
 
   const handleCreateDevice = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const response = await axios.post('/api/devices', {
-      device_key: newDeviceKey,
-      password: newDevicePassword,
-    });
+    try {
+      const response = await axios.post('/api/devices', {
+        device_key: newDeviceKey,
+        password: newDevicePassword,
+      });
 
-    setDevices([...devices, response.data]);
-    setNewDeviceKey('');
-    setNewDevicePassword('');
+      setDevices([...devices, response.data]);
+      setNewDevicePassword('');
+      setNewDeviceKey(uuidv4());
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      // Handle error
+    }
   };
 
   return (
@@ -73,3 +89,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+
