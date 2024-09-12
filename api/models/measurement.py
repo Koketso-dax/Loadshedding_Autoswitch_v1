@@ -4,8 +4,8 @@
 import psycopg2
 
 class Measurement:
-    def __init__(self, device_name, timestamp, power_measurement):
-        self.device_name = device_name
+    def __init__(self, device_id, timestamp, power_measurement):
+        self.device_id = device_id
         self.timestamp = timestamp
         self.power_measurement = power_measurement
 
