@@ -1,6 +1,6 @@
 """ MQTT Client Module"""
 import paho.mqtt.client as mqtt
-from measurement_model import Measurement
+from models.measurement import Measurement
 
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
