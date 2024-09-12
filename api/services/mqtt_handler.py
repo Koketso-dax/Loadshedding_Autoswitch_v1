@@ -1,27 +1,21 @@
 """ MQTT Client Module"""
 import paho.mqtt.client as mqtt
-from models.device import Device
-from models.measurement import Measurement
-from models import db
-
+from measurement_model import Measurement
 
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
     client.subscribe("devices/#")
 
+    # Create continuous aggregates when the program starts up
+    Measurement.create_continuous_aggregates()
+
 def on_message(client, userdata, msg):
-    device_key = msg.topic.split('/')[1]
-    device = Device.query.filter_by(device_key=device_key).first()
-
-    if not device:
-        print(f"Device with key {device_key} not found")
-        return
-
+    device_name = msg.topic.split('/')[1]
     data = msg.payload.decode('utf-8')
     timestamp, power_measurement = data.split(',')
-    measurement = Measurement(device=device, timestamp=timestamp, power_measurement=float(power_measurement))
-    db.session.add(measurement)
-    db.session.commit()
+    measurement = Measurement(device_name=device_name, timestamp=timestamp,
+                              power_measurement=float(power_measurement))
+    measurement.save()
 
 def init_mqtt_client(app):
     """ Client init for MQTT """

@@ -12,13 +12,13 @@ class Device(db.Model):
     __tablename__ = 'devices'
 
     id = db.Column(db.Integer, primary_key=True)
-    device_key = db.Column(db.String(128), nullable=False)
+    device_name = db.Column(db.String(128), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     measurements = db.relationship('Measurement')
 
-    def __init__(self, device_key, user):
-        self.device_key = device_key
+    def __init__(self, device_name, user):
+        self.device_name = device_name
         self.user = user
 
     def get_measurements(self):
@@ -37,12 +37,12 @@ class Device(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def update_device_key(self, new_device_key):
-        self.device_key = new_device_key
+    def update_device_name(self, new_device_name):
+        self.device_name = new_device_name
         db.session.commit()
 
     def to_dict(self):
         return {
             'id': self.id,
-            'device_key': self.device_key,
+            'device_name': self.device_name,
         }
