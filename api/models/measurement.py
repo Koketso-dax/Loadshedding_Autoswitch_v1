@@ -50,8 +50,8 @@ class Measurement:
             user="postgres",
             password="password",
             host="localhost",
-            port="5433")
-
+            port="5433"
+        )
         cur = conn.cursor()
 
         # Create continuous aggregate for energy consumption by day
@@ -59,40 +59,45 @@ class Measurement:
             CREATE MATERIALIZED VIEW kwh_day_by_day(time, device_id, value)
                 WITH (timescaledb.continuous) AS
             SELECT time_bucket('1 day', timestamp, 'UTC') AS "time",
-                   device_id,
-                   round((last(power_measurement, timestamp) - first(power_measurement, timestamp)) * 100.) / 100. AS value
+                device_id,
+                0 AS value
             FROM measurements
             GROUP BY 1, 2;
-                    """)
+        """)
 
         # Add refresh policy for energy consumption by day
         cur.execute("""
             SELECT add_continuous_aggregate_policy('kwh_day_by_day',
-                start_offset => NULL,
-                end_offset => INTERVAL '1 hour',
-                schedule_interval => INTERVAL '1 hour');
-                    """)
+            start_offset => NULL,
+            end_offset => INTERVAL '1 hour',
+            schedule_interval => INTERVAL '1 hour');
+        """)
 
         # Create continuous aggregate for energy consumption by hour
         cur.execute("""
-        CREATE MATERIALIZED VIEW kwh_hour_by_hour(time, device_id, value)
-            WITH (timescaledb.continuous) AS
-        SELECT time_bucket('1 hour', timestamp, 'UTC') AS "time",
-               device_id,
-               round((last(power_measurement, timestamp) - first(power_measurement, timestamp)) * 100.) / 100. AS value
-        FROM measurements
-        GROUP BY 1, 2;
-                    """)
+            CREATE MATERIALIZED VIEW kwh_hour_by_hour(time, device_id, value)
+                WITH (timescaledb.continuous) AS
+            SELECT time_bucket('1 hour', timestamp, 'UTC') AS "time",
+                device_id,
+                0 AS value
+            FROM measurements
+            GROUP BY 1, 2;
+        """)
 
         # Add refresh policy for energy consumption by hour
         cur.execute("""
-        SELECT add_continuous_aggregate_policy('kwh_hour_by_hour',
-           start_offset => NULL,
-           end_offset => INTERVAL '1 hour',
-           schedule_interval => INTERVAL '1 hour');
-                    """)
+            SELECT add_continuous_aggregate_policy('kwh_hour_by_hour',
+            start_offset => NULL,
+            end_offset => INTERVAL '1 hour',
+            schedule_interval => INTERVAL '1 hour');
+        """)
+
+        conn.commit()
+
+        # Populate the materialized views with data
+        cur.execute("REFRESH MATERIALIZED VIEW kwh_day_by_day")
+        cur.execute("REFRESH MATERIALIZED VIEW kwh_hour_by_hour")
 
         conn.commit()
         cur.close()
         conn.close()
-
