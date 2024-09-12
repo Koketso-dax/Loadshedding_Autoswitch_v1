@@ -31,7 +31,7 @@ class Measurement:
                     device_id INTEGER NOT NULL REFERENCES devices(device_id),
                     timestamp TIMESTAMPTZ NOT NULL,
                     power_measurement FLOAT NOT NULL
-                )
+                );
             """)
             conn.commit()
 
