@@ -36,7 +36,7 @@ class Measurement:
             conn.commit()
 
         # Insert the measurement data into the measurements table
-        cur.execute("INSERT INTO measurements (device_id, timestamp, power_measurement) VALUES (%s, %s, %s)",
+        cur.execute("INSERT INTO measurements (device_id, timestamp, power_measurement) VALUES (%s, %s, %s);",
                     (self.device_id, self.timestamp, self.power_measurement))
         conn.commit()
 
