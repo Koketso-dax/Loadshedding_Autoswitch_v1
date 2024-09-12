@@ -18,9 +18,28 @@ class Measurement:
             port="5433"
         )
         cur = conn.cursor()
-        cur.execute("INSERT INTO measurements (device_name, timestamp, power_measurement) VALUES (%s, %s, %s)",
-                    (self.device_name, self.timestamp, self.power_measurement))
+
+        # Check if the measurements table exists
+        cur.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'measurements')")
+        table_exists = cur.fetchone()[0]
+
+        if not table_exists:
+            # Create the measurements table with a foreign key constraint to the devices table
+            cur.execute("""
+                CREATE TABLE measurements (
+                    measurement_id SERIAL PRIMARY KEY,
+                    device_id INTEGER NOT NULL REFERENCES devices(device_id),
+                    timestamp TIMESTAMPTZ NOT NULL,
+                    power_measurement FLOAT NOT NULL
+                )
+            """)
+            conn.commit()
+
+        # Insert the measurement data into the measurements table
+        cur.execute("INSERT INTO measurements (device_id, timestamp, power_measurement) VALUES (%s, %s, %s)",
+                    (self.device_id, self.timestamp, self.power_measurement))
         conn.commit()
+
         cur.close()
         conn.close()
 
