@@ -1,9 +1,14 @@
+'use client';
+
 import ViewDevices from './ViewDevices';
 import CreateDevice from './CreateDevice';
-import { cookies } from 'next/headers';
+import { redirect } from "next/navigation";
+import React from 'react';
 
 export default function Dashboard() {
-  const access_token = cookies().get('access_token')?.value;
+  const access_token = localStorage.getItem('token')
+  
+  if(!access_token) redirect('/login');
 
   return (
     <div className="max-w-md mx-auto mt-8">
