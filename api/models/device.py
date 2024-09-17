@@ -44,5 +44,5 @@ class Device(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'device_name': self.device_key,
+            'device_key': self.device_key,
         }
