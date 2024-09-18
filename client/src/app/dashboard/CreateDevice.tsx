@@ -4,10 +4,6 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 
-interface Device {
-  id: number;
-  device_key: string;
-}
 
 interface CreateDeviceProps {
   accessToken: string;
@@ -21,7 +17,7 @@ const CreateDevice: React.FC<CreateDeviceProps> = ({ accessToken }) => {
     event.preventDefault();
 
     try {
-      const response = await axios.post('http://web-01.koketsodiale.tech/api/devices', {
+        await axios.post('http://web-01.koketsodiale.tech/api/devices', {
         device_key: newDeviceKey,
         password: newDevicePassword,
       }, {
@@ -35,6 +31,7 @@ const CreateDevice: React.FC<CreateDeviceProps> = ({ accessToken }) => {
     } catch (error) {
       const axiosError = error as AxiosError;
       // Handle error
+      console.error(axiosError)
     }
   };
 

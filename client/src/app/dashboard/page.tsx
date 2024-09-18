@@ -1,4 +1,5 @@
-'use client';
+'use client'
+
 
 import ViewDevices from './ViewDevices';
 import CreateDevice from './CreateDevice';

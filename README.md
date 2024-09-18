@@ -4,7 +4,7 @@
 
 [Loadshedding Autoswitch Article](https://medium.com/@lanchaster.k/loadshedding-auto-switch-3957d99c7d93).
 
-<p> This project is aimed at creating a highly available, low latency API to communicate with IoT devices to monitor metrics such as energy generation & usage in order to leverage the information for use in various applications such as power failure detection and energy trading. </p>
+<p> This project is aimed at creating a highly available, low latency API to communicate with IoT devices to monitor metrics such as energy generation & usage in order to leverage the information for use in various applications such as power failure detection and energy trading. The UI has not been deployed however, the api is available at web-01.koketsodiale.tech/api.</p>
 
 <h6> Installation </h6>
 

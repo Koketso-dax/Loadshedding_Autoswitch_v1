@@ -17,6 +17,7 @@ export default function Home() {
           priority
         />
       </div>
+      <br/>
       <LandingText/>
     </main>
   );
