@@ -5,11 +5,14 @@ import axios, {AxiosError} from 'axios';
 import { useRouter } from 'next/navigation';
 
 export default function Login() {
+  /** Create state variables for username and password */
+  /** Create function to handle input changes */
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
+  /** Create function to handle login form submission */
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 

@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useToast } from "@/hooks/use-toast"
 
+/**Create signup schema for client side validation */
 const signUpSchema = z.object({
-  username: z.string().min(3, 'Username must be at least 3 characters'),
+  username: z.string().min(8, 'Username must be at least 8 characters'),
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
@@ -19,8 +20,12 @@ const signUpSchema = z.object({
       'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character'),
 })
 
+/**Create type for signup values */
 type SignUpValues = z.infer<typeof signUpSchema>
 
+/**
+ * Sign up page component
+ */
 export default function SignUpPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
@@ -34,8 +39,26 @@ export default function SignUpPage() {
     },
   })
 
+  /**Handle form submission */
   async function onSubmit(data: SignUpValues) {
     setIsLoading(true)
+    /** try to send request to /register route
+     * if successful, redirect to login page
+     * if failed, display error message
+     * finally, set loading state to false
+     * 
+     * @param data - signup values
+     * @returns void
+     * @throws Error - if registration fails
+     * @example
+     * onSubmit({ username: 'XXXX', password: 'XXXXXXXX' })
+     * @description
+     * This function sends a POST request to the /register route with the signup values.
+     * If the request is successful, the user is redirected to the login page.
+     * If the request fails, an error message is displayed.
+     * The function also sets the loading state to false after the request is completed.
+     * 
+    */
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',

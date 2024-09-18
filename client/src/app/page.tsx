@@ -1,6 +1,8 @@
 import Image from "next/image";
+import LandingText from "@/components/LandingText";
 import * as React from "react";
 
+/** Project Root Landing Page */
 export default function Home() {
   return (
     <main className="flex flex-col items-center justify-between p-24">
@@ -15,6 +17,7 @@ export default function Home() {
           priority
         />
       </div>
+      <LandingText/>
     </main>
   );
 }

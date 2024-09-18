@@ -34,6 +34,11 @@ const buttonVariants = cva(
   }
 )
 
+/**
+ * This is a custom button component that can be used in place of a standard button element.
+ * It supports all the same props as a standard button element, as well as additional props
+ * for controlling the variant and size of the button.
+ */
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {

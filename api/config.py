@@ -1,5 +1,6 @@
 import os
 
+# Define class for config.
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'your_secret_key')
     SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:password@localhost:5433/autoswitch'

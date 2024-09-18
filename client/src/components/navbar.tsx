@@ -12,10 +12,19 @@ import { Button } from "./ui/button"
 import Link from "next/link"
 import { useRouter } from 'next/navigation'
 
+/**
+ * Navbar component for the application.
+ * This component renders the navigation menu and the mode toggle button.
+ * It also handles the logout functionality and checks the login status.
+ */
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
   const router = useRouter()
 
+  /**
+   * useEffect to check the login status and update the state accordingly.
+   * It runs on component mount and sets an interval to check the login status periodically.
+   */
   React.useEffect(() => {
     const checkLoginStatus = () => {
       const token = localStorage.getItem('token')
@@ -30,12 +39,21 @@ export default function Navbar() {
     }
   }, [])
 
+  /**
+   * Function to handle the logout functionality.
+   * It removes the token from local storage, sets the isLoggedIn state to false,
+   * and navigates to the home page.
+   */
   const handleLogout = () => {
     localStorage.removeItem('token')
     setIsLoggedIn(false)
     router.push('/')
   }
 
+  /**
+   * Render the navigation menu and the mode toggle button.
+   * The mode toggle button is rendered only if the user is logged in.
+   */
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between">

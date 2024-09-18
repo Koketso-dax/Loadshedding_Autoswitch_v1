@@ -1,3 +1,8 @@
+"""
+Main program for the Flask API.
+Author: Koketso Diale
+Date: 2024-07-22
+"""
 from flask import Flask
 from config import Config
 from models import db
@@ -7,14 +12,18 @@ from routes.devices import devices
 from routes.data import data
 from services.mqtt_handler import init_mqtt_client
 
+# define function to instantiate all the parts of the API
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     
 
+    # Initialize db engine with the app
+    # Initialize JWT service
     db.init_app(app)
     JWTManager(app)
 
+    # Register Blueprints from routes
     app.register_blueprint(auth, url_prefix='/api/auth')
     app.register_blueprint(devices, url_prefix='/api')
     app.register_blueprint(data, url_prefix='/api')
@@ -22,8 +31,10 @@ def create_app():
     with app.app_context():
         db.create_all()
 
+    # Initialize MQTT Service
     init_mqtt_client(app)
 
+    # Handle CORS
     @app.after_request
     def after_request(response):
         response.headers.add('Access-Control-Allow-Origin', '*')
@@ -33,6 +44,7 @@ def create_app():
 
     return app
 
+# Run app.
 app = create_app()
 if __name__ == '__main__':
     app.run(debug=True)

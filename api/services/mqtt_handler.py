@@ -4,10 +4,12 @@ from models.device import Device
 from models.measurement import Measurement
 from models import db
 
+# Send a response to device after UDP handshake
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
     client.subscribe("devices/#")
 
+# Save measurement to database
 def on_message(client, userdata, msg):
     device_id = int(msg.topic.split('/')[1])
     data = msg.payload.decode('utf-8')
@@ -15,6 +17,7 @@ def on_message(client, userdata, msg):
     measurement = Measurement(device_id=device_id, timestamp=timestamp, power_measurement=float(power_measurement))
     measurement.save()
 
+# Initialize MQTT Broker
 def init_mqtt_client(app):
     """ Client init for MQTT """
     client = mqtt.Client()
