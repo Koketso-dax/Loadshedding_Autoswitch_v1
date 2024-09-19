@@ -40,6 +40,23 @@ def get_devices():
     return jsonify(devices), 200
 
 # Retrieve a device using its id.
+@devices.route('/<int:device_id>', methods=['GET'])
+@jwt_required()
+def get_device(device_id):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    device = Device.query.get(device_id)
+
+    if not device or device.user_id != user.id:
+        return jsonify({'message': 'Device not found'}), 404
+
+    return jsonify(device.to_dict()), 200
+
+# delete a device
 @devices.route('/<int:device_id>', methods=['DELETE'])
 @jwt_required
 def remove_device(device_id):

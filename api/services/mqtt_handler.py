@@ -1,8 +1,9 @@
 """ MQTT Client Module"""
+
 import paho.mqtt.client as mqtt
 from models.device import Device
 from models.measurement import Measurement
-from models import db
+
 
 # Send a response to device after UDP handshake
 def on_connect(client, userdata, flags, rc):
@@ -20,8 +21,14 @@ def on_message(client, userdata, msg):
 # Initialize MQTT Broker
 def init_mqtt_client(app):
     """ Client init for MQTT """
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.connect(app.config['MQTT_BROKER'], app.config['MQTT_PORT'], 60)
-    client.loop_start()
+    devices = Device.query.all()
+    clients = []
+    for device in devices:
+        client = mqtt.Client()
+        client.username_pw_set(device.device_key, device.user.password)
+        client.on_connect = on_connect
+        client.on_message = on_message
+        client.connect(app.config['MQTT_BROKER'], app.config['MQTT_PORT'], 60)
+        client.loop_start()
+        clients.append(client)
+    return clients
