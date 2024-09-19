@@ -2,7 +2,6 @@
     Python module for data hypertables
 """
 from models import db
-from sqlalchemy import Pagination
 
 class Measurement(db.Model):
     """ Class definition for measurement Hypertable """
