@@ -17,6 +17,8 @@ def get_device_data(device_id):
         return jsonify({'message': 'Device not found'}), 404
 
     # Retrieve measurements for the device.
-    measurements = Measurement.query.filter_by(device_id=device_id).all()
-    data = [measurement.to_dict() for measurement in measurements]
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    query = Measurement.query.filter_by(device_id=device_id).order_by(Measurement.timestamp.desc())
+    data = Measurement.to_dict(query, page, per_page)
     return jsonify(data), 200

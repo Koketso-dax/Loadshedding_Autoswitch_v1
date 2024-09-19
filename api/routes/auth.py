@@ -1,3 +1,6 @@
+"""
+Route to handle all authentication in the backend.
+"""
 from flask import Blueprint, request, jsonify
 from models.user import User
 from flask_jwt_extended import create_access_token
