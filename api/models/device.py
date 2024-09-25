@@ -2,7 +2,7 @@
     Python module for Device Table
 """
 from models import db
-from models.measurement import Measurement
+from models.metric import Metric
 
 # Define Devices Table
 
@@ -16,28 +16,28 @@ class Device(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     device_key = db.Column(db.String(128), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    #relationship with measurements table
-    measurements = db.relationship('Measurement')
+    #relationship with metrics table
+    metrics = db.relationship('Metric')  # update relationship to Metric
 
     def __init__(self, device_key, user):
         self.device_key = device_key
         self.user = user
 
-    def get_measurements(self):
-        # retrieve measurements for specific device
-        return self.measurements
+    def get_metrics(self):  # update method name to get_metrics
+        # retrieve metrics for specific device
+        return self.metrics
 
-    def add_measurements(self, timestamp, power_measurement):
-        measurements = Measurement(timestamp=timestamp,
-                                   power_measurement=power_measurement,
-                                   device = self)
-        db.session.add(measurements)
+    def add_metric(self, timestamp, value):  # update method name to add_metric
+        metric = Metric(timestamp=timestamp,
+                        value=value,
+                        device=self)
+        db.session.add(metric)
         db.session.commit()
 
     def delete(self):
         # remove a device
-        for measurement in self.measurements:
-            db.session.delete(measurement)
+        for metric in self.metrics:  # update loop variable to metric
+            db.session.delete(metric)
         db.session.delete(self)
         db.session.commit()
 

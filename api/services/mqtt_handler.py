@@ -2,7 +2,7 @@
 
 import paho.mqtt.client as mqtt
 from models.device import Device
-from models.measurement import Measurement
+from models.metric import Metric
 
 
 # Send a response to device after UDP handshake
@@ -10,13 +10,15 @@ def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
     client.subscribe("devices/#")
 
-# Save measurement to database
+
+# Save metric to database
 def on_message(client, userdata, msg):
     device_id = int(msg.topic.split('/')[1])
     data = msg.payload.decode('utf-8')
-    timestamp, power_measurement = data.split(',')
-    measurement = Measurement(device_id=device_id, timestamp=timestamp, power_measurement=float(power_measurement))
-    measurement.save()
+    timestamp, value = data.split(',')
+    metric = Metric(device_id=device_id, timestamp=timestamp, value=float(value))
+    metric.save()
+
 
 # Initialize MQTT Broker
 def init_mqtt_client(app):

@@ -1,10 +1,13 @@
 import os
+from dotenv import load_dotenv
 
+
+load_dotenv()
 # Define class for config.
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'your_secret_key')
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:password@localhost:5433/autoswitch'
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt_secret_key')
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
     MQTT_BROKER = '127.0.0.1'
     MQTT_PORT = 1883
