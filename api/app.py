@@ -15,13 +15,9 @@ from services.mqtt_handler import init_mqtt_client
 # define function to instantiate all the parts of the API
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(Config)
-    
-
-    # Initialize db engine with the app
-    # Initialize JWT service
-    db.init_app(app)
-    JWTManager(app)
+    app.config.from_object(Config) # config file with .env vars
+    db.init_app(app) # init the db
+    JWTManager(app) # init JWT using custom key in .env
 
     # Register Blueprints from routes
     app.register_blueprint(auth, url_prefix='/api/auth')
@@ -29,10 +25,9 @@ def create_app():
     app.register_blueprint(data, url_prefix='/api')
 
     with app.app_context():
+        # db context for app & access for mqtt
         db.create_all()
-
-    # Initialize MQTT Service
-    init_mqtt_client(app)
+        init_mqtt_client(app)
 
     # Handle CORS
     @app.after_request
