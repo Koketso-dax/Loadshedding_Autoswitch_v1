@@ -33,4 +33,5 @@ def init_mqtt_client(app):
         client.connect(app.config['MQTT_BROKER'], app.config['MQTT_PORT'], 60)
         client.loop_start()
         clients.append(client)
+    app.mqtt_clients = clients
     return clients
