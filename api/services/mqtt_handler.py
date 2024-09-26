@@ -21,13 +21,13 @@ def on_message(client, userdata, msg):
 
 
 # Initialize MQTT Broker
-def init_mqtt_client(app):
+def init_mqtt_client(app, access_token):
     """ Client init for MQTT """
     devices = Device.query.all()
     clients = []
     for device in devices:
         client = mqtt.Client()
-        client.username_pw_set(device.device_key, device.user.password)
+        client.username_pw_set(device.device_key, access_token)
         client.on_connect = on_connect
         client.on_message = on_message
         client.connect(app.config['MQTT_BROKER'], app.config['MQTT_PORT'], 60)
