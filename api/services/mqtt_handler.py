@@ -21,7 +21,7 @@ def on_message(client, userdata, msg):
 
 
 # Initialize MQTT Broker
-def init_mqtt_client(app, access_token):
+def init_mqtt_client(app):
     """ Client init for MQTT """
     devices = Device.query.all()
     clients = []
