@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 export async function GET() {
   try {
     const token = cookies().get('token')?.value;
-    const response = await axios.get('http://web-01.koketsodiale.tech/api/devices', {
+    const response = await axios.get('https://web-01.koketsodiale.tech/api/devices', {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": `application/json`,
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const { device_key, password } = await request.json();
     const token = cookies().get('token')?.value;
     const response = await axios.post(
-      'http://web-01.koketsodiale.tech/api/devices',
+      'https://web-01.koketsodiale.tech/api/devices',
       { device_key, password },
       {
         headers: {

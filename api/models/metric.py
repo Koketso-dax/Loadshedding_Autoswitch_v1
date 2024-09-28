@@ -5,7 +5,24 @@ from models import db
 
 
 class Metric(db.Model):
-    """ Class definition for metric Hypertable """
+    """
+    Class definition for metric Hypertable
+    ---
+    Attributes:
+        id: primary key
+        device_id: foreign key to devices table
+        timestamp: timestamp of the metric
+        value: value of the metric
+    ---
+    Methods:
+        save: save a metric to the database
+        to_dict: convert query results to a dictionary with pagination
+    ---
+    Hypertable:
+        timescaledb_hypertable: creates a hypertable from the table
+        chunk_time_interval: sets the chunk time interval to 1 hour
+        time_column: sets the time column to timestamp
+    """
     __tablename__ = 'metrics'
     __table_args__ = (
         {

@@ -10,14 +10,31 @@ from datetime import timedelta
 
 class Device(db.Model):
     """
-        Class for Device Table
+        Class representation of Devices
+        ---
+        properties:
+
+            id: int
+            device_key: str
+            user_id: int
+            state: str
+            metrics: list
+
+        methods:
+
+            get_metrics: list
+            add_metric: None
+            delete: None
+            update_device_key: None
+            to_dict: dict
     """
     __tablename__ = 'devices'
 
     # Data members for devices
     id = db.Column(db.Integer, primary_key=True)
     device_key = db.Column(db.String(128), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey('users.id'), nullable=False)
     state = db.Column(db.String(10), default='on')
     #relationship with metrics table
     metrics = db.relationship('Metric')
@@ -27,10 +44,26 @@ class Device(db.Model):
         self.user = user
 
     def get_metrics(self):
-        # retrieve metrics for specific device
+        """
+        Retrieves metrics for current device.
+        ---
+
+        Returns:
+            list: list of metrics for current device
+
+        """
         return self.metrics
 
-    def add_metric(self, timestamp, value):  # update method name to add_metric
+    def add_metric(self, timestamp, value):
+        """
+        Adds a new metric to the device & checks if the device should be
+        turned off based on the average value change over the past 30 min.
+        ---
+
+        Parameters:
+            timestamp: datetime
+            value: int
+        """
         metric = Metric(timestamp=timestamp,
                         value=value,
                         device=self)
@@ -52,19 +85,34 @@ class Device(db.Model):
                 db.session.commit()
 
     def delete(self):
-        # remove a device
-        for metric in self.metrics:  # update loop variable to metric
+        """
+        Deletes a device and its associated metrics.
+        ---
+
+        """
+        for metric in self.metrics:
             db.session.delete(metric)
         db.session.delete(self)
         db.session.commit()
 
     def update_device_key(self, new_device_key):
-        # Update a device's name
+        """
+        Updates the device key for the current device.
+        ---
+
+        Parameters:
+
+            new_device_key: str
+
+        """
         self.device_name = new_device_key
         db.session.commit()
 
     def to_dict(self):
-        # device properties
+        """
+        Converts device object to dictionary.
+        ---
+        """
         return {
             'id': self.id,
             'device_key': self.device_key,

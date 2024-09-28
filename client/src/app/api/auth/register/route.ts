@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   const { username, password } = await request.json();
 
   try {
-    const response = await axios.post('http://web-01.koketsodiale.tech/api/auth/register', {
+    const response = await axios.post('https://web-01.koketsodiale.tech/api/auth/register', {
       username,
       password,
     });

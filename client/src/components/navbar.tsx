@@ -1,5 +1,3 @@
-'use client'
-
 import * as React from 'react'
 import {
   NavigationMenu,
@@ -11,6 +9,7 @@ import { ModeToggle } from "./mode-toggle"
 import { Button } from "./ui/button"
 import Link from "next/link"
 import { useRouter } from 'next/navigation'
+import {cookies} from "next/headers";
 
 /**
  * Navbar component for the application.
@@ -27,7 +26,7 @@ export default function Navbar() {
    */
   React.useEffect(() => {
     const checkLoginStatus = () => {
-      const token = localStorage.getItem('token')
+      const token = cookies().get('token')
       setIsLoggedIn(!!token)
     }
 
@@ -45,7 +44,7 @@ export default function Navbar() {
    * and navigates to the home page.
    */
   const handleLogout = () => {
-    localStorage.removeItem('token')
+    cookies().delete('token')
     setIsLoggedIn(false)
     router.push('/')
   }

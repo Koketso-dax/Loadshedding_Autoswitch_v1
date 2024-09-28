@@ -21,7 +21,7 @@ const ViewDevices: React.FC<ViewDevicesProps> = ({ accessToken }) => {
     const fetchDevices = async () => {
       try {
         // Make the GET request to retrieve all devices for the user
-        const response = await axios.get('http://web-01.koketsodiale.tech/api/devices', {
+        const response = await axios.get('https://web-01.koketsodiale.tech/api/devices', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },

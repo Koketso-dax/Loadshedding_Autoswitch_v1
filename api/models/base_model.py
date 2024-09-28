@@ -6,5 +6,5 @@ from sqlalchemy.orm import DeclarativeBase
 # Define common declarative base class
 
 class Base(DeclarativeBase):
-    """ Common base class """
+    """ Common class inheriting from declarative base """
     pass

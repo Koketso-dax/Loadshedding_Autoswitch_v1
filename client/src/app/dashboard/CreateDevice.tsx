@@ -17,7 +17,7 @@ const CreateDevice: React.FC<CreateDeviceProps> = ({ accessToken }) => {
     event.preventDefault();
 
     try {
-        await axios.post('http://web-01.koketsodiale.tech/api/devices', {
+        await axios.post('https://web-01.koketsodiale.tech/api/devices', {
         device_key: newDeviceKey,
         password: newDevicePassword,
       }, {
