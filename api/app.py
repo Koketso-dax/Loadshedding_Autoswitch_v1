@@ -31,7 +31,7 @@ def create_app():
     app.register_blueprint(devices, url_prefix='/api')
     app.register_blueprint(data, url_prefix='/api')
 
-    @app.before_first_request
+    @app.before_request
     def get_docs():
         swag_from('/routes/auth.yml')(auth)
         swag_from('/routes/devices.yml')(devices)
