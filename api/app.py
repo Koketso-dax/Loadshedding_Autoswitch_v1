@@ -12,11 +12,17 @@ from routes.devices import devices
 from routes.data import data
 from services.mqtt_handler import init_mqtt_client
 from flasgger.utils import swag_from
+from flasgger import Swagger
 
 # define function to instantiate all the parts of the API
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config) # config file with .env vars
+    app.config['SWAGGER'] = {
+    'title': 'Loadshedding Autoswitch API',
+    'uiversion': 3
+    }
+    swagger = Swagger(app)
     db.init_app(app) # init the db
     JWTManager(app) # init JWT using custom key in .env
 
