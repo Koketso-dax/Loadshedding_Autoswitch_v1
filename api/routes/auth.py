@@ -10,28 +10,6 @@ auth = Blueprint('auth', __name__)
 # Create route to handle registration from client side.
 @auth.route('/register', methods=['POST'])
 def register():
-    """
-    Register a new user
-    ---
-    parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            username:
-              type: string
-              description: The username for the new user
-            password:
-              type: string
-              description: The password for the new user
-    responses:
-      201:
-        description: User created successfully
-      400:
-        description: Missing username or password, or username already exists
-    """
     username = request.json.get('username')
     password = request.json.get('password')
 
@@ -49,37 +27,6 @@ def register():
 # Create route to handle login functionality using jwt.
 @auth.route('/login', methods=['POST'])
 def login():
-    """
-    Authenticate a user and return an access token
-    ---
-    parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            username:
-              type: string
-              description: The username of the user to authenticate
-            password:
-              type: string
-              description: The password of the user to authenticate
-    responses:
-      200:
-        description: Authentication successful
-        schema:
-          type: object
-          properties:
-            access_token:
-              type: string
-              description: The access token for the authenticated user
-      400:
-        description: Missing username or password
-      401:
-        description: Invalid username or password
-    """
-
     username = request.json.get('username')
     password = request.json.get('password')
 

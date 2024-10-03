@@ -9,40 +9,6 @@ devices = Blueprint('devices', __name__)
 @devices.route('/devices', methods=['POST'])
 @jwt_required()
 def add_device():
-    """
-    Add a new device for the authenticated user
-    ---
-    parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            device_key:
-              type: string
-              description: The unique key for the new device
-            password:
-              type: string
-              description: The password for the authenticated user
-    responses:
-      201:
-        description: Device added successfully
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              description: A success message
-            device_id:
-              type: integer
-              description: The ID of the new device
-      400:
-        description: Missing device_key or password
-      404:
-        description: User not found
-    """
-
     device_key = request.json.get('device_key')
     password = request.json.get('password')
 
@@ -64,27 +30,6 @@ def add_device():
 @devices.route('/devices', methods=['GET'])
 @jwt_required()
 def get_devices():
-    """
-    Retrieve all devices belonging to the authenticated user
-    ---
-    responses:
-      200:
-        description: Devices retrieved successfully
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                description: The ID of the device
-              device_key:
-                type: string
-                description: The unique key for the device
-      404:
-        description: User not found
-    """
-
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 
@@ -98,31 +43,6 @@ def get_devices():
 @devices.route('/<int:device_id>', methods=['GET'])
 @jwt_required()
 def get_device(device_id):
-    """
-    Retrieve a device using its ID
-    ---
-    parameters:
-      - name: device_id
-        in: path
-        type: integer
-        required: true
-        description: The ID of the device to retrieve
-    responses:
-      200:
-        description: Device retrieved successfully
-        schema:
-          type: object
-          properties:
-            id:
-              type: integer
-              description: The ID of the device
-            device_key:
-              type: string
-              description: The unique key for the device
-      404:
-        description: User not found or device not found or does not belong to the user
-    """
-
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 
@@ -140,28 +60,6 @@ def get_device(device_id):
 @devices.route('/<int:device_id>', methods=['DELETE'])
 @jwt_required
 def remove_device(device_id):
-    """
-    Delete a device using its ID
-    ---
-    parameters:
-      - name: device_id
-        in: path
-        type: integer
-        required: true
-        description: The ID of the device to delete
-    responses:
-      200:
-        description: Device removed successfully
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              description: A success message
-      404:
-        description: User not found or device not found or does not belong to the user
-    """
-
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 

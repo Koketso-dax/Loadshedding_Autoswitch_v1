@@ -1,0 +1,108 @@
+swagger: '2.0'
+info:
+  title: Devices API
+  description: API documentation for managing user devices.
+  version: "1.0"
+
+basePath: /api
+schemes:
+  - http
+paths:
+  /devices:
+    post:
+      tags:
+        - Devices
+      summary: Add a new device for the authenticated user
+      parameters:
+        - in: body
+          name: body
+          description: The device to add and user password
+          required: true
+          schema:
+            type: object
+            properties:
+              device_key:
+                type: string
+                description: The unique key of the device
+              password:
+                type: string
+                description: User's password for authentication
+      responses:
+        201:
+          description: Device added successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              device_id:
+                type: integer
+        400:
+          description: Missing device_key or password
+        404:
+          description: User not found
+          
+    get:
+      tags:
+        - Devices
+      summary: Retrieve all devices for the authenticated user
+      responses:
+        200:
+          description: A list of devices
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                device_key:
+                  type: string
+                created_at:
+                  type: string
+                  format: date-time
+        404:
+          description: User not found
+
+  /devices/{device_id}:
+    get:
+      tags:
+        - Devices
+      summary: Retrieve a specific device by its ID
+      parameters:
+        - in: path
+          name: device_id
+          required: true
+          type: integer
+          description: The ID of the device to retrieve
+      responses:
+        200:
+          description: Device retrieved successfully
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              device_key:
+                type: string
+              created_at:
+                type: string
+                format: date-time
+        404:
+          description: Device not found or does not belong to the user
+
+    delete:
+      tags:
+        - Devices
+      summary: Remove a specific device by its ID
+      parameters:
+        - in: path
+          name: device_id
+          required: true
+          type: integer
+          description: The ID of the device to remove
+      responses:
+        200:
+          description: Device removed successfully
+        404:
+          description: Device not found or does not belong to the user

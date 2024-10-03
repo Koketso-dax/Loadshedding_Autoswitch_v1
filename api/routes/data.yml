@@ -1,0 +1,53 @@
+swagger: '2.0'
+info:
+  title: Data API
+  description: API documentation for manipulating and retrieving device data.
+  version: "1.0"
+
+basePath: /api
+schemes:
+  - http
+paths:
+  /data/{device_id}:
+    get:
+      tags:
+        - Data
+      summary: Retrieve metrics data for a specific device by its ID
+      parameters:
+        - in: path
+          name: device_id
+          required: true
+          type: string
+          description: The ID of the device whose data is being retrieved
+        - in: query
+          name: page
+          required: false
+          type: integer
+          description: The page number for paginated results (default is 1)
+        - in: query
+          name: per_page
+          required: false
+          type: integer
+          description: The number of results per page (default is 10)
+      responses:
+        200:
+          description: Successfully retrieved device data
+          schema:
+            type: object
+            properties:
+              metrics:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    device_id:
+                      type: string
+                    value:
+                      type: number
+                    timestamp:
+                      type: string
+                      format: date-time
+        404:
+          description: Device not found or does not belong to the user

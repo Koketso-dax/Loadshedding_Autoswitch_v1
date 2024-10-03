@@ -21,8 +21,16 @@ def on_message(client, userdata, msg):
 
 
 # Initialize MQTT Broker
-def init_mqtt_client(app):
-    """ Client init for MQTT """
+def init_mqtt_client(app)->list:
+    """
+    Client init for MQTT
+    ---
+    Args:
+        app (Flask): Flask app instance
+
+    Returns:
+        list: List of MQTT clients
+    """
     devices = Device.query.all()
     clients = []
     for device in devices:

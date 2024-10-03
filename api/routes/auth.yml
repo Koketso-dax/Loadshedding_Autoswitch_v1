@@ -1,0 +1,63 @@
+swagger: '2.0'
+info:
+  title: Autoswitch Authentication API
+  description: API documentation for authentication routes.
+  version: "1.0"
+  
+basePath: /api
+schemes:
+  - http
+paths:
+  /register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      parameters:
+        - in: body
+          name: body
+          description: The user to create
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+      responses:
+        201:
+          description: User created successfully
+        400:
+          description: Missing username or password, or username already exists
+          
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate a user and return an access token
+      parameters:
+        - in: body
+          name: body
+          description: User credentials
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: Authentication successful
+          schema:
+            type: object
+            properties:
+              access_token:
+                type: string
+                description: The access token for the authenticated user
+        400:
+          description: Missing username or password
+        401:
+          description: Invalid username or password

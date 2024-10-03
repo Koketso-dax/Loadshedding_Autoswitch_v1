@@ -11,13 +11,12 @@ from routes.auth import auth
 from routes.devices import devices
 from routes.data import data
 from services.mqtt_handler import init_mqtt_client
-from flasgger import Swagger
+from flasgger.utils import swag_from
 
 # define function to instantiate all the parts of the API
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config) # config file with .env vars
-    Swagger(app) # swagger for API docs.
     db.init_app(app) # init the db
     JWTManager(app) # init JWT using custom key in .env
 
@@ -26,6 +25,12 @@ def create_app():
     app.register_blueprint(devices, url_prefix='/api')
     app.register_blueprint(data, url_prefix='/api')
 
+    @app.before_first_request
+    def get_docs():
+        swag_from('/routes/auth.yml')(auth)
+        swag_from('/routes/devices.yml')(devices)
+        swag_from('/routes/data.yml')(data)
+
     with app.app_context():
         # db context for app & access for mqtt
         db.create_all()
@@ -33,7 +38,7 @@ def create_app():
 
     # Handle CORS
     @app.after_request
-    def after_request(response):
+    def handle_cors(response):
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
         response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
