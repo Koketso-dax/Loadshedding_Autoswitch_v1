@@ -1,4 +1,4 @@
-swagger: '2.0'
+swagger: '3.0'
 info:
   title: Autoswitch Authentication API
   description: API documentation for authentication routes.

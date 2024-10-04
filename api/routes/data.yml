@@ -1,4 +1,4 @@
-swagger: '2.0'
+swagger: '3.0'
 info:
   title: Data API
   description: API documentation for manipulating and retrieving device data.

@@ -33,9 +33,9 @@ def create_app():
 
     @app.before_request
     def get_docs():
-        swag_from('/routes/auth.yml')(auth)
-        swag_from('/routes/devices.yml')(devices)
-        swag_from('/routes/data.yml')(data)
+        swag_from('api/routes/auth.yml')(auth)
+        swag_from('api/routes/devices.yml')(devices)
+        swag_from('api/routes/data.yml')(data)
 
     with app.app_context():
         # db context for app & access for mqtt
