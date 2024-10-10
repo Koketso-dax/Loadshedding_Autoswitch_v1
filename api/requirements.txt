@@ -1,0 +1,10 @@
+bcrypt
+Flask
+Flask-Bcrypt
+Flask-JWT_Extended
+Flask-Cors
+paho-mqtt
+psycopg2-binary
+SQLAlchemy
+sqlalchemy-timescaledb
+flasgger

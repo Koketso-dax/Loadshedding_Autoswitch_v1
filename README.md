@@ -15,19 +15,12 @@ The application has two main components:
 
 To install the API you will need a Linux VM (Ubuntu V20.04) NB: this application has only been tested in the above stated machine.
 
-- Python 3.8 (with pip)
-- PostgreSQL Server (latest release)
-- MQTT Broker (latest release)
+- Python v3.8 (with pip)
+- PostgreSQL Server (@main13)
+- MQTT Broker (v 2.0.11)
 - Timescaledb (core)
 
-Additionally you need the following pip packeges:
-
-- bcrypt
-- flask
-- Flask-Bcrypt
-- Flask-JWT_Extended
-- paho-mqtt
-- psycopg2-binary
+Then run requirements.txt
 
 Once you have installed these packages, you can run this app via app.py.
 
