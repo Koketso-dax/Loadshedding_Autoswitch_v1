@@ -1,15 +1,15 @@
-import * as React from 'react'
+import * as React from "react";
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-} from "@/components/ui/navigation-menu"
-import { ModeToggle } from "./mode-toggle"
-import { Button } from "./ui/button"
-import Link from "next/link"
-import { useRouter } from 'next/navigation'
-import {cookies} from "next/headers";
+} from "@/components/ui/navigation-menu";
+import { ModeToggle } from "./mode-toggle";
+import { Button } from "./ui/button";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { cookies } from "next/headers";
 
 /**
  * Navbar component for the application.
@@ -17,8 +17,8 @@ import {cookies} from "next/headers";
  * It also handles the logout functionality and checks the login status.
  */
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false)
-  const router = useRouter()
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const router = useRouter();
 
   /**
    * useEffect to check the login status and update the state accordingly.
@@ -26,17 +26,17 @@ export default function Navbar() {
    */
   React.useEffect(() => {
     const checkLoginStatus = () => {
-      const token = cookies().get('token')
-      setIsLoggedIn(!!token)
-    }
+      const token = cookies().get("token");
+      setIsLoggedIn(!!token);
+    };
 
-    checkLoginStatus()
+    checkLoginStatus();
     const intervalId = setInterval(checkLoginStatus, 500);
 
     return () => {
       clearInterval(intervalId);
-    }
-  }, [])
+    };
+  }, []);
 
   /**
    * Function to handle the logout functionality.
@@ -44,10 +44,10 @@ export default function Navbar() {
    * and navigates to the home page.
    */
   const handleLogout = () => {
-    cookies().delete('token')
-    setIsLoggedIn(false)
-    router.push('/')
-  }
+    cookies().delete("token");
+    setIsLoggedIn(false);
+    router.push("/");
+  };
 
   /**
    * Render the navigation menu and the mode toggle button.
@@ -107,5 +107,5 @@ export default function Navbar() {
         </div>
       </div>
     </header>
-  )
+  );
 }

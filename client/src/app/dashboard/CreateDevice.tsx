@@ -1,37 +1,42 @@
 // CreateDevice.tsx
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import axios, { AxiosError } from 'axios';
-
+import React, { useState } from "react";
+import axios, { AxiosError } from "axios";
 
 interface CreateDeviceProps {
   accessToken: string;
 }
 
 const CreateDevice: React.FC<CreateDeviceProps> = ({ accessToken }) => {
-  const [newDevicePassword, setNewDevicePassword] = useState('');
-  const [newDeviceKey, setNewDeviceKey] = useState('');
+  const [newDevicePassword, setNewDevicePassword] = useState("");
+  const [newDeviceKey, setNewDeviceKey] = useState("");
 
-  const handleCreateDevice = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateDevice = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
 
     try {
-        await axios.post('https://web-01.koketsodiale.tech/api/devices', {
-        device_key: newDeviceKey,
-        password: newDevicePassword,
-      }, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+      await axios.post(
+        "http://web-01.koketsodiale.tech/api/devices",
+        {
+          device_key: newDeviceKey,
+          password: newDevicePassword,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
 
-      setNewDevicePassword('');
-      setNewDeviceKey('');
+      setNewDevicePassword("");
+      setNewDeviceKey("");
     } catch (error) {
       const axiosError = error as AxiosError;
       // Handle error
-      console.error(axiosError)
+      console.error(axiosError);
     }
   };
 

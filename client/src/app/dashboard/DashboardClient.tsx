@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import React from 'react'
-import ViewDevices from './ViewDevices'
-import CreateDevice from './CreateDevice'
+import React from "react";
+import ViewDevices from "./ViewDevices";
+import CreateDevice from "./CreateDevice";
 
 interface DashboardClientProps {
-  accessToken: string
+  accessToken: string;
 }
 
 export default function DashboardClient({ accessToken }: DashboardClientProps) {
@@ -15,5 +15,5 @@ export default function DashboardClient({ accessToken }: DashboardClientProps) {
       <CreateDevice accessToken={accessToken} />
       <ViewDevices accessToken={accessToken} />
     </div>
-  )
+  );
 }

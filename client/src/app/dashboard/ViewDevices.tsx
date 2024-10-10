@@ -1,8 +1,8 @@
 // ViewDevices.tsx
-'use client';
+"use client";
 
-import React,{ useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 interface Device {
   id: number;
@@ -21,11 +21,14 @@ const ViewDevices: React.FC<ViewDevicesProps> = ({ accessToken }) => {
     const fetchDevices = async () => {
       try {
         // Make the GET request to retrieve all devices for the user
-        const response = await axios.get('https://web-01.koketsodiale.tech/api/devices', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
+        const response = await axios.get(
+          "http://web-01.koketsodiale.tech/api/devices",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
           },
-        });
+        );
 
         // Set the devices state with the response data
         setDevices(response.data);
@@ -39,7 +42,7 @@ const ViewDevices: React.FC<ViewDevicesProps> = ({ accessToken }) => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {devices.map(device => (
+      {devices.map((device) => (
         <div key={device.id} className="bg-white shadow-md rounded-lg p-4">
           <h2 className="text-lg font-bold mb-2">{device.name}</h2>
           <p className="text-gray-700 mb-2">Device Key: {device.device_key}</p>

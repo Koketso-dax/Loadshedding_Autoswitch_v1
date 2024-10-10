@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import React,{ useState } from 'react';
-import axios, {AxiosError} from 'axios';
-import { useRouter } from 'next/navigation';
+import React, { useState } from "react";
+import axios, { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   /** Create state variables for username and password */
   /** Create function to handle input changes */
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
   /** Create function to handle login form submission */
@@ -17,18 +17,18 @@ export default function Login() {
     event.preventDefault();
 
     try {
-      const response = await axios.post('/api/auth/login', {
+      const response = await axios.post("/api/auth/login", {
         username,
         password,
       });
 
       // Store the token in local storage or a cookie
-      localStorage.setItem('token', response.data.access_token);
+      localStorage.setItem("token", response.data.access_token);
 
-      router.push('/dashboard');
+      router.push("/dashboard");
     } catch (error) {
-        const axiosError = error as AxiosError;
-        const errorData = axiosError.response?.data as {message: string};
+      const axiosError = error as AxiosError;
+      const errorData = axiosError.response?.data as { message: string };
       setErrorMessage(errorData.message);
     }
   };
@@ -36,7 +36,10 @@ export default function Login() {
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8">
       <div className="mb-4">
-        <label htmlFor="username" className="block text-gray-700 font-bold mb-2">
+        <label
+          htmlFor="username"
+          className="block text-gray-700 font-bold mb-2"
+        >
           Username
         </label>
         <input
@@ -48,7 +51,10 @@ export default function Login() {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="password" className="block text-gray-700 font-bold mb-2">
+        <label
+          htmlFor="password"
+          className="block text-gray-700 font-bold mb-2"
+        >
           Password
         </label>
         <input
@@ -71,4 +77,3 @@ export default function Login() {
     </form>
   );
 }
-
