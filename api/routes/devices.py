@@ -2,11 +2,13 @@ from flask import Blueprint, request, jsonify
 from models.user import User
 from models.device import Device
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flasgger.utils import swag_from
 
 devices = Blueprint('devices', __name__)
 
 # Create a new device for the user using their password.
 @devices.route('/devices', methods=['POST'])
+@swag_from('/docs/devices.yml', methods=['POST'])
 @jwt_required()
 def add_device():
     device_key = request.json.get('device_key')
@@ -28,6 +30,7 @@ def add_device():
 
 # Retrieve all devices belonging to a user.
 @devices.route('/devices', methods=['GET'])
+@swag_from('/docs/devices.yml', methods=['GET'])
 @jwt_required()
 def get_devices():
     user_id = get_jwt_identity()
@@ -41,6 +44,7 @@ def get_devices():
 
 # Retrieve a device using its id.
 @devices.route('/<int:device_id>', methods=['GET'])
+@swag_from('/docs/devices.yml/<int:device_id>', methods=['GET'])
 @jwt_required()
 def get_device(device_id):
     user_id = get_jwt_identity()
@@ -58,6 +62,7 @@ def get_device(device_id):
 
 # delete a device
 @devices.route('/<int:device_id>', methods=['DELETE'])
+@swag_from('/docs/devices.yml/<int:device_id>', methods=['DELETE'])
 @jwt_required
 def remove_device(device_id):
     user_id = get_jwt_identity()

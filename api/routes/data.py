@@ -5,14 +5,16 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.device import Device
 from models.metric import Metric
-data = Blueprint('data', __name__)
+from flasgger.utils import swag_from
 
+data = Blueprint('data', __name__)
 # Retrieve device data by id.
 @data.route('/data/<device_id>', methods=['GET'])
+@swag_from('/docs/data/<int:device_id>')
 @jwt_required()
-def get_device_data(device_id):
-    user_id = get_jwt_identity()
-    device = Device.query.get(device_id)
+def get_device_data(device_id: int):
+    user_id: str = get_jwt_identity()
+    device:Device = Device.query.get(device_id)
 
     # Check if device exists and belongs to the user.
     if not device or device.user_id != user_id:

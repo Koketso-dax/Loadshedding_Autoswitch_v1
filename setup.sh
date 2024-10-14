@@ -8,20 +8,6 @@ sudo apt upgrade -y
 # install gunicorn
 sudo apt-get install gunicorn -y
 
-# Add GPG key for the PostgreSQL repository
-sudo apt -y install vim bash-completion wget 
-wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-
-# Add the PostgreSQL repository to the sources list
-echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |sudo tee  /etc/apt/sources.list.d/pgdg.list
-
-# Install PostgreSQL 13
-sudo apt update
-sudo apt install postgresql-13 postgresql-client-13 -y
-
-# Start the PostgreSQL service
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
 
 # Install Timescaledb dependencies
 sudo apt install gnupg postgresql-common apt-transport-https lsb-release wget

@@ -37,8 +37,6 @@ class Metric(db.Model):
     timestamp = db.Column(db.DateTime())
     value = db.Column(db.Float)
 
-    device = db.relationship('Device')
-
     def save(self):
         db.session.add(self)
         db.session.commit()

@@ -4,10 +4,12 @@ Route to handle all authentication in the backend.
 from flask import Blueprint, request, jsonify
 from models.user import User
 from flask_jwt_extended import create_access_token
+from flasgger.utils import swag_from
 
 auth = Blueprint('auth', __name__)
 
 # Create route to handle registration from client side.
+@swag_from('/docs/auth/register')
 @auth.route('/register', methods=['POST'])
 def register():
     username = request.json.get('username')
@@ -25,6 +27,7 @@ def register():
     return jsonify({'message' : 'User created succesfully'}), 201
 
 # Create route to handle login functionality using jwt.
+@swag_from('/docs/auth/login')
 @auth.route('/login', methods=['POST'])
 def login():
     username = request.json.get('username')

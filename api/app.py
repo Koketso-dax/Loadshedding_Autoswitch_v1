@@ -11,7 +11,6 @@ from routes.auth import auth
 from routes.devices import devices
 from routes.data import data
 from services.mqtt_handler import init_mqtt_client
-from flasgger.utils import swag_from
 from flasgger import Swagger
 
 # define function to instantiate all the parts of the API
@@ -22,7 +21,8 @@ def create_app():
     'title': 'Loadshedding Autoswitch API',
     'uiversion': 3
     }
-    swagger = Swagger(app)
+    
+    Swagger(app)
     db.init_app(app) # init the db
     JWTManager(app) # init JWT using custom key in .env
 
@@ -30,12 +30,6 @@ def create_app():
     app.register_blueprint(auth, url_prefix='/api/auth')
     app.register_blueprint(devices, url_prefix='/api')
     app.register_blueprint(data, url_prefix='/api')
-
-    @app.before_request
-    def get_docs():
-        swag_from('api/routes/auth.yml')(auth)
-        swag_from('api/routes/devices.yml')(devices)
-        swag_from('api/routes/data.yml')(data)
 
     with app.app_context():
         # db context for app & access for mqtt
