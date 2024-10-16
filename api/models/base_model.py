@@ -1,10 +1,9 @@
 """
     Module for common base class
 """
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 
-# Define common declarative base class
 
-class Base(DeclarativeBase):
+class Base(DeclarativeBase, MappedAsDataclass):
     """ Common class inheriting from declarative base """
     pass

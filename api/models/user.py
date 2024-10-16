@@ -1,11 +1,12 @@
 """
     Module for the User table
 """
-from typing import List, NoReturn
+from typing import List, NoReturn, Union
 from flask_bcrypt import Bcrypt
 from models.device import Device
 import jwt
 from datetime import datetime, timedelta
+from sqlalchemy.orm import Mapped
 from models import db
 
 bcrypt = Bcrypt()
@@ -13,27 +14,21 @@ bcrypt = Bcrypt()
 
 class User(db.Model):
     """
-        User Model for storing user details.
+        Model for storing user details.
         ------------------------------------
-        properties:
-            id: int
-            username: str
-            password_hash: str
-            devices: list[Device]
-        ------------------------------------
-        methods:
-            check_password: bool
-            register_user: User
-            register_device: Device
-            generate_token: str
-            verify_token: User
+        Attributes:
+            id (int): unique identifier for the user.
+            username (str): User's display name.
+            password_hash (str): Hashed password for the user.
+            devices (list): User's associated devices.
     """
     __tablename__ = 'users'
 
-    id: int = db.Column(db.Integer, primary_key=True)
-    username: str = db.Column(db.String(128), unique=True, nullable=False)
-    password_hash: str = db.Column(db.String(128), nullable=False)
-    devices: List[Device] = db.relationship('Device', backref='user', lazy=True)
+    id: Mapped[int] = db.Column(db.Integer, primary_key=True)
+    username: Mapped[str] = db.Column(db.String(128), unique=True, nullable=False)
+    password_hash: Mapped[str] = db.Column(db.String(128), nullable=False)
+    devices: Mapped[List[Device]] = db.relationship('Device',
+                                            backref='user', lazy=True)
 
     @property
     def password(self) -> NoReturn:
@@ -45,47 +40,43 @@ class User(db.Model):
         """
         Hash password before storing it.
         --------------------------------
-        parameters:
-            password: str
+        :params password: User's password.
         """
-        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        hsh: str = bcrypt.generate_password_hash(password).decode('utf-8')
+        self.password_hash = hsh
 
     def check_password(self, password: str) -> bool:
         """
         Authenticate user password agaist hash.
         ---------------------------------------
-        parameters:
-            password: str
-        returns:
-            bool
+        :param password: input password.
+        :return bool: true if password is correct.
+        ---------------------------------------
         """
         return bcrypt.check_password_hash(self.password_hash, password)
-    
+
     @staticmethod
     def register_user(username: str, password: str) -> 'User':
         """
         Register new user.
-        ------------------
-        parameters:
-            username: str
-            password: str
-        returns:
-            User
+        -----------------------------------
+        :param username: User's unique name
+        :param password: User's password
+        :return User: newly created user
         """
         user = User(username=username, password=password)
         db.session.add(user)
         db.session.commit()
         return user
 
-    def register_device(self, device_key: str, password: str) -> Device:
+    def register_device(self, device_key: str,
+                        password: str) -> Union[Device, None]:
         """
         Register new device.
         --------------------
-        parameters:
-            device_key: str
-            password: str
-        returns:
-            Device
+        :param device_key: Device name identifier.
+        :param password: User's password.
+        :return Device: newly created device
         """
         if self.check_password(password):
             device = Device(device_key=device_key, user=self)
@@ -96,34 +87,31 @@ class User(db.Model):
             # throw error if password is incorrect
             raise ValueError('Invalid password')
 
-    def generate_token(self, secret_key: str, expiration_minutes: int=60) -> str:
+    def generate_token(self, secret_key: str,
+                       expiration_minutes: int = 60) -> str:
         """
         Generate access token for user.
         -------------------------------
-        parameters:
-            secret_key: str
-            expiration_minutes: int
-        -------------------------------
-        returns:
-            token: str
+        :params secret_key: JWT secret key.
+        :params expiration_minutes: Token expiration time in minutes.
+        :return token: Generated token from user id and expiration time.
         """
         payload = {
             'user_id': self.id,
-            'exp': datetime.uctnow() + timedelta(minutes=expiration_minutes)
+            'exp': datetime.utcnow() + timedelta(minutes=expiration_minutes)
         }
         token = jwt.encode(payload, secret_key, algorithm='HS256')
         return token
 
     @staticmethod
-    def verify_token(token: str, secret_key: str) -> 'User':
+    def verify_token(token: str, secret_key: str) -> Union['User', None]:
         """
         Verify access token.
         --------------------
-        parameters:
-            token: str
-            secret_key: str
-        returns:
-            User
+        :params token: Client token.
+        :params secret_key: Server config token.
+        :returns: User object if token is valid.
+        :raises: InvalidTokenError if token is invalid.
         """
         try:
             payload = jwt.decode(token, secret_key, algorithms=['HS256'])
