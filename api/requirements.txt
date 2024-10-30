@@ -3,6 +3,7 @@ Flask
 Flask-Bcrypt
 Flask-JWT_Extended
 Flask-Cors
+Flask-Limiter  
 paho-mqtt
 psycopg2-binary
 SQLAlchemy

@@ -42,8 +42,10 @@ class User(db.Model):
 
     # Primary columns
     id: Mapped[int] = mapped_column(primary_key=True)
-    username: Mapped[str] = mapped_column(db.String(128), unique=True, nullable=False)
-    email: Mapped[str] = mapped_column(db.String(255), unique=True, nullable=False)
+    username: Mapped[str] = mapped_column(db.String(128),
+                                          unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(db.String(255),
+                                       unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(db.String(128), nullable=False)
     status: Mapped[UserStatus] = mapped_column(
         db.Enum(UserStatus),

@@ -39,7 +39,8 @@ class Device(db.Model):
     __tablename__ = 'devices'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    device_key: Mapped[str] = mapped_column(db.String(128), unique=True, nullable=False, index=True)
+    device_key: Mapped[str] = mapped_column(db.String(128), unique=True,
+                                            nullable=False, index=True)
     user_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     status: Mapped[str] = mapped_column(db.String(20), default=DeviceStatus.UNKNOWN)
     last_seen: Mapped[datetime] = mapped_column(db.DateTime(timezone=True), 
@@ -79,7 +80,8 @@ class Device(db.Model):
         """Check if device is currently active"""
         return (
             self.status == DeviceStatus.ON and
-            datetime.now(timezone.utc) - self.last_seen <= self.INACTIVITY_THRESHOLD
+            datetime.now(timezone.utc) - self.last_seen
+            <= self.INACTIVITY_THRESHOLD
         )
     
     def add_metric(self, 
@@ -138,10 +140,9 @@ class Device(db.Model):
             metrics.append(metric)
         
         db.session.bulk_save_objects(metrics)
-        self._update_status(metrics[-1])  # Update status based on latest metric
+        self._update_status(metrics[-1])  # Update based on latest metric
         self.last_seen = metrics[-1].timestamp
         db.session.commit()
-        
         return metrics
     
     def get_metrics(self,
@@ -162,21 +163,21 @@ class Device(db.Model):
             Query object for metrics
         """
         query = self.metrics
-        
+
         if metric_type_id is not None:
             query = query.filter(Metric.metric_type_id == metric_type_id)
-        
+
         if start_time is not None:
             query = query.filter(Metric.timestamp >= start_time)
-        
+
         if end_time is not None:
             query = query.filter(Metric.timestamp <= end_time)
-            
+
         query = query.order_by(Metric.timestamp.desc())
-        
+
         if limit is not None:
             query = query.limit(limit)
-            
+
         return query
     
     def get_metric_statistics(self,

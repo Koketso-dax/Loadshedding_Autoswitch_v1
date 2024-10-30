@@ -1,5 +1,5 @@
 """
-    Python module for data hypertables
+    Python module for metric data hypertables
 """
 from __future__ import annotations
 from datetime import datetime, timedelta
@@ -74,10 +74,14 @@ class Metric(db.Model):
         })
 
     id: Mapped[int] = db.Column(db.Integer, primary_key=True)
-    device_id: Mapped[int] = db.Column(db.Integer,db.ForeignKey('devices.id'), nullable=False)
-    metric_type_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey('metric_types.id'), nullable=False)
-    timestamp: Mapped[datetime] = db.Column(db.DateTime(timezone=True), nullable=False)
-    value: Mapped[float] = db.Column(db.Float, nullable=False)
+    device_id: Mapped[int] = db.Column(db.Integer,
+                                       db.ForeignKey('devices.id'), nullable=False)
+    metric_type_id: Mapped[int] = db.Column(db.Integer,
+                                            db.ForeignKey('metric_types.id'), nullable=False)
+    timestamp: Mapped[datetime] = db.Column(db.DateTime(timezone=True),
+                                            nullable=False)
+    value: Mapped[float] = db.Column(db.Float,
+                                     nullable=False)
     metadata: Mapped[Dict] = db.Column(JSONB, default={})
     quality: Mapped[float] = db.Column(db.Float, default=1.0)
 
@@ -90,7 +94,7 @@ class Metric(db.Model):
         db.session.commit()
 
     @validates('value')
-    def validate_value(self, key: str, value: float) -> float:
+    def validate_value(self, value: float) -> float:
         """Validate metric value against metric type rules"""
         if self.metric_type and self.metric_type.validation_rules:
             rules = self.metric_type.validation_rules
