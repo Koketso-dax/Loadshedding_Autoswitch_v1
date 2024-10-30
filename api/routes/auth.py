@@ -1,6 +1,7 @@
 """
 Route to handle all authentication in the backend.
 """
+from config import Config
 from __future__ import annotations
 from typing import TypedDict, Tuple, Optional, Dict, Any
 from flask import Blueprint, request, jsonify, current_app, Response
@@ -9,7 +10,8 @@ from flask_jwt_extended import (
     create_refresh_token,
     jwt_required,
     get_jwt_identity,
-    get_jwt
+    get_jwt,
+    unset_jwt_cookies
 )
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -121,7 +123,7 @@ def register() -> Tuple[Response, int]:
                 'access_token': access_token,
                 'refresh_token': refresh_token,
                 'token_type': 'bearer',
-                'expires_in': current_app.config['JWT_ACCESS_TOKEN_EXPIRES'].total_seconds()
+                'expires_in': int(Config.JWT_ACCESS_TOKEN_EXPIRES)
             }
         }
         
@@ -180,7 +182,7 @@ def login() -> Tuple[Response, int]:
             'access_token': access_token,
             'refresh_token': refresh_token,
             'token_type': 'bearer',
-            'expires_in': int(current_app.config['JWT_ACCESS_TOKEN_EXPIRES'].total_seconds())
+            'expires_in': int(Config.JWT_ACCESS_TOKEN_EXPIRES)
         }
         
         return jsonify(response), 200
@@ -210,7 +212,7 @@ def refresh() -> Tuple[Response, int]:
         return jsonify({
             'access_token': access_token,
             'token_type': 'bearer',
-            'expires_in': int(current_app.config['JWT_ACCESS_TOKEN_EXPIRES'].total_seconds())
+            'expires_in': int(Config.JWT_ACCESS_TOKEN_EXPIRES)
         }), 200
         
     except Exception as e:
@@ -228,9 +230,9 @@ def logout() -> Tuple[Response, int]:
     """
     try:
         jti = get_jwt()['jti']
-        # Add token to blocklist (implementation needed)
+        unset_jwt_cookies(jsonify({'message': 'Successfully logged out'}))
         return jsonify({'message': 'Successfully logged out'}), 200
-        
+
     except Exception as e:
         current_app.logger.error(f"Logout error: {str(e)}")
         return jsonify({'message': 'Internal server error'}), 500
