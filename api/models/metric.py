@@ -16,6 +16,7 @@ from models import db
 
 T = TypeVar('T')
 
+
 class AggregationType(str, Enum):
     """Supported aggregation types for time-series data"""
     AVG = 'avg'
@@ -47,8 +48,9 @@ class MetricType(db.Model):
     unit: Mapped[str] = db.Column(db.String(20))
     description: Mapped[str] = db.Column(db.Text)
     validation_rules: Mapped[Dict] = db.Column(JSONB)
-    
+
     metrics = relationship("Metric", back_populates="metric_type")
+
 
 class Metric(db.Model):
     """
@@ -75,9 +77,11 @@ class Metric(db.Model):
 
     id: Mapped[int] = db.Column(db.Integer, primary_key=True)
     device_id: Mapped[int] = db.Column(db.Integer,
-                                       db.ForeignKey('devices.id'), nullable=False)
+                                       db.ForeignKey('devices.id'),
+                                       nullable=False)
     metric_type_id: Mapped[int] = db.Column(db.Integer,
-                                            db.ForeignKey('metric_types.id'), nullable=False)
+                                            db.ForeignKey('metric_types.id'),
+                                            nullable=False)
     timestamp: Mapped[datetime] = db.Column(db.DateTime(timezone=True),
                                             nullable=False)
     value: Mapped[float] = db.Column(db.Float,
@@ -105,9 +109,10 @@ class Metric(db.Model):
         return value
 
     @classmethod
-    def create_continuous_aggregate(cls, view_name: str, 
-                                  interval: str = '1 hour',
-                                  aggregation_type: AggregationType = AggregationType.AVG):
+    def create_continuous_aggregate(cls, view_name: str,
+                                    interval: str = '1 hour',
+                                    aggregation_type: AggregationType =
+                                    AggregationType.AVG):
         """Create a continuous aggregate view for the metrics"""
         sql = text(f"""
             CREATE MATERIALIZED VIEW {view_name}
@@ -126,12 +131,13 @@ class Metric(db.Model):
         db.session.commit()
 
     @classmethod
-    def get_timerange_stats(cls, 
-                           device_id: int,
-                           metric_type_id: int,
-                           start_time: datetime,
-                           end_time: datetime,
-                           interval: str = '1 hour') -> List[TimeSeriesResult]:
+    def get_timerange_stats(cls,
+                            device_id: int,
+                            metric_type_id: int,
+                            start_time: datetime,
+                            end_time: datetime,
+                            interval: str = '1 hour')\
+            -> List[TimeSeriesResult]:
         """Get statistical aggregates for a time range"""
         result = db.session.query(
             func.time_bucket(interval, cls.timestamp).label('bucket'),
@@ -160,7 +166,8 @@ class Metric(db.Model):
 
     @classmethod
     def downsample_metrics(cls,
-                          retention_policy: Dict[str, Union[str, int]]) -> None:
+                           retention_policy: Dict[str,
+                                                  Union[str, int]]) -> None:
         """Downsample old metrics based on retention policy"""
         for interval, retention in retention_policy.items():
             sql = text(f"""
@@ -199,13 +206,16 @@ class Metric(db.Model):
         db.session.commit()
 
     @classmethod
-    def get_paginated_results(cls, 
-                             query: Query,
-                             page: int,
-                             per_page: int) -> Dict[str, Union[int, float, List[Dict[str, Any]]]]:
+    def get_paginated_results(cls,
+                              query: Query,
+                              page: int,
+                              per_page: int) -> Dict[
+                                  str, Union[int, float,
+                                             List[Dict[str, Any]]]]:
         """Get paginated query results with metadata"""
-        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-        
+        pagination = query.paginate(page=page,
+                                    per_page=per_page, error_out=False)
+
         return {
             'page': page,
             'per_page': per_page,
@@ -217,6 +227,7 @@ class Metric(db.Model):
     @classmethod
     def cleanup_old_data(cls, older_than: datetime) -> int:
         """Remove old data while maintaining continuous aggregates"""
-        result = db.session.query(cls).filter(cls.timestamp < older_than).delete()
+        result = db.session.query(cls).filter(cls.timestamp
+                                              < older_than).delete()
         db.session.commit()
         return result

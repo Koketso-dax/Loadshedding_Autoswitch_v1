@@ -13,7 +13,9 @@ import jwt
 from models import db
 from models.device import Device
 
+
 bcrypt = Bcrypt()
+
 
 class UserStatus(str, Enum):
     """User account status"""
@@ -22,10 +24,11 @@ class UserStatus(str, Enum):
     SUSPENDED = 'suspended'
     PENDING_VERIFICATION = 'pending_verification'
 
+
 class User(db.Model):
     """
     Model for user management and authentication.
-    
+
     Attributes:
         id: Unique identifier
         username: Unique username
@@ -93,17 +96,17 @@ class User(db.Model):
     TOKEN_EXPIRATION = timedelta(hours=1)
     DEVICE_LIMIT = 10
 
-    def __init__(self, username: str, email: str, password: str, 
+    def __init__(self, username: str, email: str, password: str,
                  metadata: Optional[Dict] = None) -> None:
         """
         Initialize a new user instance.
-        
+
         Args:
             username: Unique username
             email: Valid email address
             password: Secure password
             metadata: Optional user metadata
-            
+
         Raises:
             ValueError: If any validation fails
         """
@@ -119,16 +122,17 @@ class User(db.Model):
         """Validate username format"""
         if not username or not isinstance(username, str):
             raise ValueError("Username must be a non-empty string")
-            
-        if not (self.USERNAME_MIN_LENGTH <= len(username) <= self.USERNAME_MAX_LENGTH):
+
+        if not (self.USERNAME_MIN_LENGTH
+                <= len(username) <= self.USERNAME_MAX_LENGTH):
             raise ValueError(
                 f"Username must be between {self.USERNAME_MIN_LENGTH} and "
                 f"{self.USERNAME_MAX_LENGTH} characters"
             )
-            
+
         if not username.isalnum():
             raise ValueError("Username must be alphanumeric")
-            
+
         return username
 
     @validates('email')
@@ -137,11 +141,11 @@ class User(db.Model):
         import re
         if not email or not isinstance(email, str):
             raise ValueError("Email must be a non-empty string")
-            
+
         email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(email_regex, email):
             raise ValueError("Invalid email format")
-            
+
         return email.lower()
 
     @property
@@ -154,55 +158,58 @@ class User(db.Model):
         """Hash and set password"""
         if not password or len(password) < self.PASSWORD_MIN_LENGTH:
             raise ValueError(
-                f"Password must be at least {self.PASSWORD_MIN_LENGTH} characters"
+                f"Password must be at least
+                {self.PASSWORD_MIN_LENGTH} characters"
             )
-        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        self.password_hash = bcrypt.generate_password_hash(
+            password).decode('utf-8')
 
     def check_password(self, password: str) -> bool:
         """
         Verify password and handle login attempts.
-        
+
         Args:
             password: Password to verify
-            
+
         Returns:
             bool: True if password matches
-            
+
         Raises:
             ValueError: If account is locked
         """
         now = datetime.now(timezone.utc)
-        
+
         # Check if account is locked
-        if (self._failed_login_attempts >= self.MAX_LOGIN_ATTEMPTS and 
-            self._last_login_attempt and 
-            now - self._last_login_attempt < self.LOGIN_TIMEOUT):
+        if (self._failed_login_attempts >= self.MAX_LOGIN_ATTEMPTS and
+            self._last_login_attempt and
+                now - self._last_login_attempt < self.LOGIN_TIMEOUT):
             raise ValueError(
                 f"Account is locked. Try again in "
-                f"{(self.LOGIN_TIMEOUT - (now - self._last_login_attempt)).seconds // 60} minutes"
+                f"{(self.LOGIN_TIMEOUT -
+                    (now - self._last_login_attempt)).seconds // 60} minutes"
             )
 
         # Verify password
         is_valid = bcrypt.check_password_hash(self.password_hash, password)
-        
+
         if is_valid:
             self._failed_login_attempts = 0
             self.last_login = now
         else:
             self._failed_login_attempts += 1
             self._last_login_attempt = now
-            
+
         return is_valid
 
     def generate_token(self, secret_key: str,
-                      expiration: Optional[timedelta] = None) -> str:
+                       expiration: Optional[timedelta] = None) -> str:
         """
         Generate JWT access token.
-        
+
         Args:
             secret_key: JWT secret key
             expiration: Optional custom expiration time
-            
+
         Returns:
             str: Encoded JWT token
         """
@@ -218,40 +225,40 @@ class User(db.Model):
     def verify_token(token: str, secret_key: str) -> Optional[User]:
         """
         Verify and decode JWT token.
-        
+
         Args:
             token: JWT token to verify
             secret_key: Server secret key
-            
+
         Returns:
             Optional[User]: User instance if token is valid
         """
         try:
             payload = jwt.decode(token, secret_key, algorithms=['HS256'])
             user = User.query.get(payload['user_id'])
-            
+
             if user and user.username == payload['username']:
                 return user
             return None
-            
+
         except jwt.InvalidTokenError:
             return None
 
     @classmethod
-    def register_user(cls, username: str, email: str, 
-                     password: str, metadata: Optional[Dict] = None) -> User:
+    def register_user(cls, username: str, email: str,
+                      password: str, metadata: Optional[Dict] = None) -> User:
         """
         Register new user with validation.
-        
+
         Args:
             username: Unique username
             email: Valid email address
             password: Secure password
             metadata: Optional user metadata
-            
+
         Returns:
             User: New user instance
-            
+
         Raises:
             ValueError: If registration fails
         """
@@ -265,34 +272,34 @@ class User(db.Model):
             db.session.add(user)
             db.session.commit()
             return user
-            
+
         except Exception as e:
             db.session.rollback()
             raise ValueError(f"Failed to register user: {str(e)}")
 
-    def register_device(self, device_key: str, 
-                       password: str,
-                       metadata: Optional[Dict] = None) -> Device:
+    def register_device(self, device_key: str,
+                        password: str,
+                        metadata: Optional[Dict] = None) -> Device:
         """
         Register new device with validation.
-        
+
         Args:
             device_key: Unique device identifier
             password: User password for verification
             metadata: Optional device metadata
-            
+
         Returns:
             Device: New device instance
-            
+
         Raises:
             ValueError: If registration fails or limit reached
         """
         if not self.check_password(password):
             raise ValueError("Invalid password")
-            
+
         if self.devices.count() >= self.DEVICE_LIMIT:
             raise ValueError(f"Device limit of {self.DEVICE_LIMIT} reached")
-            
+
         try:
             device = Device(
                 device_key=device_key,
@@ -302,7 +309,7 @@ class User(db.Model):
             db.session.add(device)
             db.session.commit()
             return device
-            
+
         except Exception as e:
             db.session.rollback()
             raise ValueError(f"Failed to register device: {str(e)}")
@@ -316,10 +323,10 @@ class User(db.Model):
     def to_dict(self, include_devices: bool = False) -> Dict[str, Any]:
         """
         Convert user to dictionary representation.
-        
+
         Args:
             include_devices: Whether to include device information
-            
+
         Returns:
             Dict: User data dictionary
         """
@@ -331,15 +338,17 @@ class User(db.Model):
             'metadata': self.metadata,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
-            'last_login': self.last_login.isoformat() if self.last_login else None
+            'last_login': self.last_login.isoformat()
+            if self.last_login else None
         }
-        
+
         if include_devices:
             user_dict['devices'] = [
                 device.to_dict() for device in self.devices.all()
             ]
-            
+
         return user_dict
+
 
 # Event listeners
 @event.listens_for(User, 'before_delete')
