@@ -32,7 +32,7 @@ sudo systemctl enable mosquitto
 sudo systemctl start mosquitto
 
 # Create service file
-sudo bash -c 'cat >  /etc/systemd/system' << EOF
+sudo bash -c 'cat >  /etc/systemd/system/autoswitch.service' << EOF
 [Unit]
 Description=Loadshedding Autoswitch API
 After=network.target
