@@ -1,30 +1,47 @@
 #!/bin/sh
 
 # Script to install all dependencies for the project
+
+# Function to check the exit status of the last command
+check_status() {
+    if [ $? -ne 0 ]; then
+        echo "Error: $1"
+        exit 1
+    fi
+}
+
+
 # Update the system packages
 sudo apt update
 sudo apt upgrade -y
 
+
 # install gunicorn
 sudo apt-get install gunicorn -y
+check_status "Failed to install gunicorn"
 
 
 # Install Timescaledb dependencies
 sudo apt install gnupg postgresql-common apt-transport-https lsb-release wget
 sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
-
 echo "deb https://packagecloud.io/timescale/timescaledb/ubuntu/ $(lsb_release -c -s) main" | sudo tee /etc/apt/sources.list.d/timescaledb.list
 wget --quiet -O - https://packagecloud.io/timescale/timescaledb/gpgkey | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/timescaledb.gpg
+check_status "Failed to add Timescaledb GPG key"
+
 
 # Install Timescaledb
 sudo apt update
 sudo apt install timescaledb-2-postgresql-16 postgresql-client-16 -y
+check_status "Failed to update package list"
+
 
 # Tune timescaledb
 sudo timescaledb-tune
+check_status "Failed to tune Timescaledb"
 
 # Restart the PostgreSQL service
 sudo systemctl restart postgresql
+check_status "Failed to restart PostgreSQL service"
 
 # Install the mosquitto broker
 sudo apt install -y mosquitto
@@ -47,8 +64,10 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 EOF
+check_status "Failed to create service file"
 
 sudo systemctl daemon-reload
+check_status "Failed to reload systemd daemon"
 
 # login to psql and create the database
 # config username, password in the .env file

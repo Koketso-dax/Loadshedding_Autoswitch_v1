@@ -3,9 +3,10 @@ Flask
 Flask-Bcrypt
 Flask-JWT_Extended
 Flask-Cors
-Flask-Limiter  
+flask_limiter
 paho-mqtt
 psycopg2-binary
 SQLAlchemy
 sqlalchemy-timescaledb
 flasgger
+dotenv
