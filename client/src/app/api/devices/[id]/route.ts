@@ -3,16 +3,15 @@ import axios from 'axios'
 
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:5000'
 
-export async function POST(request: Request) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    const body = await request.json()
     const authorization = request.headers.get('Authorization')
     
     if (!authorization) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data, status } = await axios.post(`${API_BASE_URL}/devices`, body, {
+    const { data, status } = await axios.get(`${API_BASE_URL}/devices/${params.id}`, {
       headers: { 
         'Content-Type': 'application/json',
         'Authorization': authorization
@@ -27,7 +26,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
     const authorization = request.headers.get('Authorization')
     
@@ -35,7 +34,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data, status } = await axios.get(`${API_BASE_URL}/devices`, {
+    const { data, status } = await axios.delete(`${API_BASE_URL}/devices/${params.id}`, {
       headers: { 
         'Content-Type': 'application/json',
         'Authorization': authorization
