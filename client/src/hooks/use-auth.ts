@@ -27,12 +27,12 @@ export function useAuth() {
     setLoading(true)
     setError(null)
     try {
-      const { data } = await axios.post<AuthResponse>('/api/auth/register', { username, email, password })
-      setUser(data.data?.user ?? null)
-      if (data.data?.access_token) {
-        localStorage.setItem('access_token', data.data.access_token)
+      const response = await axios.post<AuthResponse>('/api/auth/register', { username, email, password })
+      setUser(response.data.data?.user ?? null)
+      if (response.data.data?.access_token) {
+        localStorage.setItem('access_token', response.data.data.access_token)
       }
-      return data
+      return response.data
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred during registration'
       setError(errorMessage)
@@ -46,12 +46,12 @@ export function useAuth() {
     setLoading(true)
     setError(null)
     try {
-      const { data } = await axios.post<AuthResponse>('/api/auth/login', { username: identifier, password })
-      setUser(data.data?.user ?? null)
-      if (data.data?.access_token) {
-        localStorage.setItem('access_token', data.data.access_token)
+      const response = await axios.post<AuthResponse>('/api/auth/login', { username: identifier, password })
+      setUser(response.data.data?.user ?? null)
+      if (response.data.data?.access_token) {
+        localStorage.setItem('access_token', response.data.data.access_token)
       }
-      return data
+      return response.data
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred during login'
       setError(errorMessage)
@@ -83,11 +83,11 @@ export function useAuth() {
     setLoading(true)
     setError(null)
     try {
-      const { data } = await axios.get<AuthResponse>('/api/auth/me', {
+      const response = await axios.get<AuthResponse>('/api/auth/me', {
         headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
       })
-      setUser(data.data?.user ?? null)
-      return data
+      setUser(response.data.data?.user ?? null)
+      return response.data
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while fetching the profile'
       setError(errorMessage)
@@ -97,5 +97,21 @@ export function useAuth() {
     }
   }
 
-  return { user, loading, error, register, login, logout, getProfile }
+  const refreshToken = async () => {
+    try {
+      const response = await axios.post<AuthResponse>('/api/auth/refresh', {}, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+      })
+      if (response.data.data?.access_token) {
+        localStorage.setItem('access_token', response.data.data.access_token)
+      }
+      return response.data
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while refreshing the token'
+      setError(errorMessage)
+      throw error
+    }
+  }
+
+  return { user, loading, error, register, login, logout, getProfile, refreshToken }
 }
