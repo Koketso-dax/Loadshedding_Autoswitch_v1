@@ -4,6 +4,7 @@ Author: Koketso Diale
 Date: 2024-07-22
 """
 from flask import Flask
+from flask_cors import CORS
 from config import Config
 from models import db
 from flask_jwt_extended import JWTManager
@@ -17,9 +18,9 @@ from services.mqtt_handler import init_mqtt_client
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)  # config file with .env vars
-
     db.init_app(app)  # init the db
     JWTManager(app)  # init JWT using custom key in .env
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     # Register Blueprints from routes
     app.register_blueprint(auth, url_prefix='/api/auth')
@@ -30,18 +31,6 @@ def create_app():
         # db context for app & access for mqtt
         db.create_all()
         init_mqtt_client(app)
-
-    # Handle CORS
-    @app.after_request
-    def handle_cors(response):
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers',
-                             'Content-Type, Authorization')
-        response.headers.add('Access-Control-Allow-Methods',
-                             'GET, PUT, POST, DELETE, OPTIONS')
-        return response
-
-    return app
 
 
 # Run app.
