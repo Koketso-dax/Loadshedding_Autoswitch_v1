@@ -8,12 +8,14 @@
 
 <h6> Installation </h6>
 
-The application has two main components:
+Componets:
 
-- The API: which is a Flask Application coupled with an MQTT Broker and a PostgreSQL database.
-- The Client: (optional), a NextJS application which interacts with the API and has features such as a Dashboard.
+- Flask Application for User and Device Management.
+- MQTT Broker and Hub to Get sensor data and control devices.
+- PostgreSQL database with timescaledb plugin enabled.
+- The Client: NextJS Application which has all UI components.
 
-To install the API you will need a Linux VM (Ubuntu V20.04) NB: this application has only been tested in the above stated machine.
+- Tested on Ubuntu 20+
 
 - Python v3.8 (with pip)
 - PostgreSQL Server (@main13)
