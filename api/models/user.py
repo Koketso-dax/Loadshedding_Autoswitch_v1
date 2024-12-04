@@ -158,7 +158,7 @@ class User(db.Model):
         """Hash and set password"""
         if not password or len(password) < self.PASSWORD_MIN_LENGTH:
             raise ValueError(
-                f"Password must be at least
+                f"Password must be at least \
                 {self.PASSWORD_MIN_LENGTH} characters"
             )
         self.password_hash = bcrypt.generate_password_hash(
