@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
 """
 Route to handle all authentication in the backend.
 """
-from config import Config
 from __future__ import annotations
+from config import Config
 from typing import TypedDict, Tuple, Optional, Dict, Any
 from flask import Blueprint, request, jsonify, current_app, Response
 from flask_jwt_extended import (
