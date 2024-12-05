@@ -34,7 +34,7 @@ class TimeSeriesResult(Generic[T]):
     timestamp: datetime
     value: T
     device_id: int
-    metadata: Optional[Dict[str, Any]] = None
+    metric_metadata: Optional[Dict[str, Any]] = None
 
 
 class MetricType(db.Model):
@@ -86,7 +86,7 @@ class Metric(db.Model):
                                             nullable=False)
     value: Mapped[float] = db.Column(db.Float,
                                      nullable=False)
-    metadata: Mapped[Dict] = db.Column(JSONB, default={})
+    metric_metadata: Mapped[Dict] = db.Column(JSONB, default={})
     quality: Mapped[float] = db.Column(db.Float, default=1.0)
 
     device = relationship("Device", back_populates="metrics")
@@ -195,7 +195,7 @@ class Metric(db.Model):
             'metric_type_id': self.metric_type_id,
             'timestamp': self.timestamp.isoformat(),
             'value': float(self.value),
-            'metadata': self.metadata,
+            'metric_metadata': self.metadata,
             'quality': float(self.quality)
         }
 
