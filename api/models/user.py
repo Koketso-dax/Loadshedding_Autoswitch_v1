@@ -185,7 +185,7 @@ class User(db.Model):
                 now - self._last_login_attempt < self.LOGIN_TIMEOUT):
             raise ValueError(
                 f"Account is locked. Try again in "
-                f"{(self.LOGIN_TIMEOUT -
+                f"{(self.LOGIN_TIMEOUT - \
                     (now - self._last_login_attempt)).seconds // 60} minutes"
             )
 
