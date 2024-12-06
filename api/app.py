@@ -21,7 +21,7 @@ def create_app():
     app.config.from_object(Config)  # config file with .env vars
     db.init_app(app)  # init the db
     JWTManager(app)  # init JWT using custom key in .env
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    CORS(app, resources={r"/api/*": {"origins": "*"}}) #CORS
 
     # Register Blueprints from routes
     app.register_blueprint(auth, url_prefix='/api/auth')
@@ -32,9 +32,11 @@ def create_app():
         # db context for app & access for mqtt
         db.create_all()
         init_mqtt_handler(app)
+    
+    return app
 
 
 # Run app.
-app = create_app()
+main = create_app()
 if __name__ == '__main__':
-    app.run(debug=True)
+    main.run(debug=True)
