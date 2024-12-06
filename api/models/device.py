@@ -12,7 +12,11 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from models import db
 from models.metric import Metric
-from models.user import User
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from models.user import User
 
 
 class DeviceStatus(str, Enum):
@@ -34,7 +38,7 @@ class Device(db.Model):
             user_id: Associated user identifier
             status: Current device status
             last_seen: Last time device was active
-            metadata: Additional device information
+            device_metadata: Additional device information
             configuration: Device-specific settings
             metrics: Associated metrics
     """
@@ -50,8 +54,13 @@ class Device(db.Model):
     last_seen: Mapped[datetime] = mapped_column(
         db.DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc))
-    metadata: Mapped[Dict] = mapped_column(JSONB, default={})
-    configuration: Mapped[Dict] = mapped_column(JSONB, default={})
+    device_metadata: Mapped[Dict] = mapped_column(JSONB, default_factory=dict)
+    configuration: Mapped[Dict] = mapped_column(
+    JSONB, 
+    default_factory=dict,
+    nullable=False
+    )
+
 
     # Relationships
     user = relationship("User", back_populates="devices")
@@ -59,18 +68,20 @@ class Device(db.Model):
         "Metric",
         back_populates="device",
         cascade="all, delete-orphan",
-        lazy="dynamic"
+        lazy="dynamic",
+        default=list
     )
 
     # Validation thresholds
     INACTIVITY_THRESHOLD = timedelta(minutes=30)
     CHANGE_THRESHOLD = 0.1
 
-    def __init__(self, device_key: str, user: User,
-                 metadata: Optional[Dict] = None):
+
+    def __init__(self, device_key: str, user: "User",
+                 device_metadata: Optional[Dict] = None):
         self.device_key = device_key
         self.user = user
-        self.metadata = metadata or {}
+        self.device_metadata = device_metadata or {}
         self.configuration = self._get_default_configuration()
 
     @validates('device_key')
@@ -93,7 +104,7 @@ class Device(db.Model):
                    value: float,
                    metric_type_id: int,
                    timestamp: Optional[datetime] = None,
-                   metadata: Optional[Dict] = None) -> Metric:
+                   device_metadata: Optional[Dict] = None) -> Metric:
         """
         Add a new metric and update device status
 
@@ -101,7 +112,7 @@ class Device(db.Model):
             value: Metric value
             metric_type_id: Type of metric being recorded
             timestamp: Time of measurement (defaults to current time)
-            metadata: Additional metric metadata
+            device_metadata: Additional metric device_metadata
 
         Returns:
             Created metric instance
@@ -113,7 +124,7 @@ class Device(db.Model):
             metric_type_id=metric_type_id,
             timestamp=timestamp,
             value=value,
-            metadata=metadata or {}
+            device_metadata=device_metadata or {}
         )
 
         db.session.add(metric)
@@ -140,7 +151,7 @@ class Device(db.Model):
                 metric_type_id=data['metric_type_id'],
                 timestamp=data.get('timestamp', datetime.now(timezone.utc)),
                 value=data['value'],
-                metadata=data.get('metadata', {})
+                device_metadata=data.get('device_metadata', {})
             )
             metrics.append(metric)
 
@@ -247,7 +258,7 @@ class Device(db.Model):
 
     def update(self, **kwargs) -> None:
         """Update device attributes"""
-        allowed_fields = {'device_key', 'metadata', 'configuration'}
+        allowed_fields = {'device_key', 'device_metadata', 'configuration'}
         for field, value in kwargs.items():
             if field in allowed_fields:
                 setattr(self, field, value)
@@ -269,7 +280,7 @@ class Device(db.Model):
             'user_id': self.user_id,
             'status': self.status,
             'last_seen': self.last_seen.isoformat(),
-            'metadata': self.metadata,
+            'device_metadata': self.device_metadata,
             'configuration': self.configuration,
             'is_active': self.is_active
         }

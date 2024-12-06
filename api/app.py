@@ -3,15 +3,16 @@ Main program for the Flask API.
 Author: Koketso Diale
 Date: 2024-07-22
 """
+from __future__ import annotations
+from routes.auth import auth
 from flask import Flask
 from flask_cors import CORS
 from config import Config
 from models import db
 from flask_jwt_extended import JWTManager
-from routes.auth import auth
 from routes.devices import devices
 from routes.data import data
-from services.mqtt_handler import init_mqtt_client
+from services.mqtt_handler import init_mqtt_handler
 
 
 # define function to instantiate all the parts of the API
@@ -30,7 +31,7 @@ def create_app():
     with app.app_context():
         # db context for app & access for mqtt
         db.create_all()
-        init_mqtt_client(app)
+        init_mqtt_handler(app)
 
 
 # Run app.

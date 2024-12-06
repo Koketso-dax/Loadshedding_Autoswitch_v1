@@ -11,11 +11,12 @@ from sqlalchemy.orm import mapped_column, relationship, validates, Mapped
 from sqlalchemy.dialects.postgresql import JSONB
 import jwt
 from models import db
-from models.device import Device
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from models.device import Device
 
 bcrypt = Bcrypt()
-
 
 class UserStatus(str, Enum):
     """User account status"""
@@ -23,7 +24,6 @@ class UserStatus(str, Enum):
     INACTIVE = 'inactive'
     SUSPENDED = 'suspended'
     PENDING_VERIFICATION = 'pending_verification'
-
 
 class User(db.Model):
     """
@@ -35,7 +35,7 @@ class User(db.Model):
         email: User's email address
         password_hash: Securely hashed password
         status: Current account status
-        metadata: Additional user information
+        user_metadata: Additional user information
         devices: Associated devices
         created_at: Account creation timestamp
         updated_at: Last update timestamp
@@ -55,7 +55,11 @@ class User(db.Model):
         default=UserStatus.PENDING_VERIFICATION,
         nullable=False
     )
-    metadata: Mapped[Dict] = mapped_column(JSONB, default={}, nullable=False)
+    user_metadata: Mapped[Dict] = mapped_column(
+    JSONB,
+    default=dict,
+    nullable=False
+    )
     created_at: Mapped[datetime] = mapped_column(
         db.DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -69,22 +73,24 @@ class User(db.Model):
     )
     last_login: Mapped[Optional[datetime]] = mapped_column(
         db.DateTime(timezone=True),
-        nullable=True
+        nullable=True,
+        default=None
     )
 
     # Relationships
-    devices: Mapped[List[Device]] = relationship(
+    devices: Mapped[List['Device']] = relationship(
         'Device',
         back_populates='user',
         cascade='all, delete-orphan',
-        lazy='dynamic'
+        lazy='dynamic',
+        default_factory=list
     )
 
     # Indexes
     __table_args__ = (
         Index('idx_user_username_email', 'username', 'email'),
         Index('idx_user_status', 'status'),
-        Index('idx_user_metadata_gin', metadata, postgresql_using='gin')
+        Index('idx_user_user_metadata_gin', user_metadata, postgresql_using='gin')
     )
 
     # Configuration constants
@@ -97,7 +103,7 @@ class User(db.Model):
     DEVICE_LIMIT = 10
 
     def __init__(self, username: str, email: str, password: str,
-                 metadata: Optional[Dict] = None) -> None:
+                 user_metadata: Optional[Dict] = None) -> None:
         """
         Initialize a new user instance.
 
@@ -105,7 +111,7 @@ class User(db.Model):
             username: Unique username
             email: Valid email address
             password: Secure password
-            metadata: Optional user metadata
+            user_metadata: Optional user user_metadata
 
         Raises:
             ValueError: If any validation fails
@@ -113,9 +119,10 @@ class User(db.Model):
         self.username = username
         self.email = email
         self.password = password  # Will be hashed via property
-        self.metadata = metadata or {}
+        self.user_metadata = user_metadata or {}
         self._failed_login_attempts = 0
         self._last_login_attempt = None
+        self.last_login = None
 
     @validates('username')
     def validate_username(self, key: str, username: str) -> str:
@@ -245,7 +252,7 @@ class User(db.Model):
 
     @classmethod
     def register_user(cls, username: str, email: str,
-                      password: str, metadata: Optional[Dict] = None) -> User:
+                      password: str, user_metadata: Optional[Dict] = None) -> User:
         """
         Register new user with validation.
 
@@ -253,7 +260,7 @@ class User(db.Model):
             username: Unique username
             email: Valid email address
             password: Secure password
-            metadata: Optional user metadata
+            user_metadata: Optional user user_metadata
 
         Returns:
             User: New user instance
@@ -266,7 +273,7 @@ class User(db.Model):
                 username=username,
                 email=email,
                 password=password,
-                metadata=metadata
+                user_metadata=user_metadata
             )
             db.session.add(user)
             db.session.commit()
@@ -278,14 +285,14 @@ class User(db.Model):
 
     def register_device(self, device_key: str,
                         password: str,
-                        metadata: Optional[Dict] = None) -> Device:
+                        user_metadata: Optional[Dict] = None) -> "Device":
         """
         Register new device with validation.
 
         Args:
             device_key: Unique device identifier
             password: User password for verification
-            metadata: Optional device metadata
+            user_metadata: Optional device user_metadata
 
         Returns:
             Device: New device instance
@@ -299,11 +306,13 @@ class User(db.Model):
         if self.devices.count() >= self.DEVICE_LIMIT:
             raise ValueError(f"Device limit of {self.DEVICE_LIMIT} reached")
 
+        from models.device import Device  # Local import to avoid circular dependency
+
         try:
             device = Device(
                 device_key=device_key,
                 user=self,
-                metadata=metadata
+                user_metadata=user_metadata
             )
             db.session.add(device)
             db.session.commit()
@@ -313,8 +322,10 @@ class User(db.Model):
             db.session.rollback()
             raise ValueError(f"Failed to register device: {str(e)}")
 
-    def get_active_devices(self) -> List[Device]:
+    def get_active_devices(self) -> List["Device"]:
         """Get list of currently active devices"""
+        from models.device import Device  # Local import to avoid circular dependency
+
         return self.devices.filter(
             Device.status == Device.DeviceStatus.ACTIVE
         ).all()
@@ -334,7 +345,7 @@ class User(db.Model):
             'username': self.username,
             'email': self.email,
             'status': self.status,
-            'metadata': self.metadata,
+            'user_metadata': self.user_metadata,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
             'last_login': self.last_login.isoformat()
@@ -342,12 +353,13 @@ class User(db.Model):
         }
 
         if include_devices:
+            from models.device import Device  # Local import to avoid circular dependency
+
             user_dict['devices'] = [
                 device.to_dict() for device in self.devices.all()
             ]
 
         return user_dict
-
 
 # Event listeners
 @event.listens_for(User, 'before_delete')
