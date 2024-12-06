@@ -37,6 +37,6 @@ def create_app():
 
 
 # Run app.
-main = create_app()
+app = create_app()
 if __name__ == '__main__':
-    main.run(debug=True)
+    app.run(debug=True)
