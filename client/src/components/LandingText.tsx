@@ -3,7 +3,6 @@
 import React from "react";
 
 /**
- * 
  * @returns Styled landing text for Home
  */
 export default function LandingText() {

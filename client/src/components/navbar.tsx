@@ -1,4 +1,5 @@
-import * as React from "react";
+"use client";
+
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -9,7 +10,7 @@ import { ModeToggle } from "./mode-toggle";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { cookies } from "next/headers";
+import React, { useEffect, useState } from "react";
 
 /**
  * Navbar component for the application.
@@ -17,16 +18,16 @@ import { cookies } from "next/headers";
  * It also handles the logout functionality and checks the login status.
  */
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
   /**
    * useEffect to check the login status and update the state accordingly.
    * It runs on component mount and sets an interval to check the login status periodically.
    */
-  React.useEffect(() => {
+  useEffect(() => {
     const checkLoginStatus = () => {
-      const token = cookies().get("token");
+      const token = localStorage.getItem("token");
       setIsLoggedIn(!!token);
     };
 
@@ -44,7 +45,7 @@ export default function Navbar() {
    * and navigates to the home page.
    */
   const handleLogout = () => {
-    cookies().delete("token");
+    localStorage.removeItem("token");
     setIsLoggedIn(false);
     router.push("/");
   };

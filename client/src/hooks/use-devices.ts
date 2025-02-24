@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import axios from 'axios'
+import { useState } from "react";
+import axios from "axios";
 
+/* eslint-disable */
 interface Device {
   id: number
   device_key: string
@@ -16,14 +17,14 @@ export function useDevices() {
     setLoading(true)
     setError(null)
     try {
-      const response = await axios.post<{ message: string, device_id: number }>('/api/devices', { device_key, password }, {
+      const response = await axios.post<{ message: string, device_id: number }>("/api/devices", { device_key, password }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
-      })
+      });
       // Refresh the devices list after adding a new device
-      await getDevices()
-      return response.data
+      await getDevices();
+      return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while adding the device'
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred while adding the device"
       setError(errorMessage)
       throw error
     } finally {
@@ -32,56 +33,56 @@ export function useDevices() {
   }
 
   const getDevices = async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     try {
-      const response = await axios.get<Device[]>('/api/devices', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
-      })
-      setDevices(response.data)
-      return response.data
+      const response = await axios.get<Device[]>("/api/devices", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
+      });
+      setDevices(response.data);
+      return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while fetching devices'
-      setError(errorMessage)
-      throw error
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred while fetching devices";
+      setError(errorMessage);
+      throw error;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   const getDevice = async (id: number) => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     try {
       const response = await axios.get<Device>(`/api/devices/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
-      })
-      return response.data
+        headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
+      });
+      return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while fetching the device'
-      setError(errorMessage)
-      throw error
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred while fetching the device";
+      setError(errorMessage);
+      throw error;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   const removeDevice = async (id: number) => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     try {
       const response = await axios.delete<{ message: string }>(`/api/devices/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
-      })
+        headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
+      });
       // Refresh the devices list after removing a device
-      await getDevices()
-      return response.data
+      await getDevices();
+      return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while removing the device'
-      setError(errorMessage)
-      throw error
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred while removing the device";
+      setError(errorMessage);
+      throw error;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 

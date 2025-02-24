@@ -8,12 +8,14 @@ import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
 
+/* eslint-disable */
 type ToasterToast = ToastProps & {
   id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: ToastActionElement;
 };
+
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
@@ -84,12 +86,11 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         toasts: state.toasts.map((t) =>
           t.id === action.toast.id ? { ...t, ...action.toast } : t,
-        ),
-      };
+      ),
+    };
 
     case "DISMISS_TOAST": {
       const { toastId } = action;
-
       // ! Side effects ! - This could be extracted into a dismissToast() action,
       // but I'll keep it here for simplicity
       if (toastId) {

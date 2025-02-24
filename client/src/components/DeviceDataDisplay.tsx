@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from 'react'
-import { useDeviceData } from '../hooks/use-device-data'
+import React, { useEffect, useState } from "react";
+import { useDeviceData } from "../hooks/use-device-data";
 
 interface DeviceDataDisplayProps {
-  deviceId: number
+  deviceId: number;
 }
 
 export default function DeviceDataDisplay({ deviceId }: DeviceDataDisplayProps) {
-  const { data, loading, error, getDeviceData } = useDeviceData()
-  const [page, setPage] = useState(1)
-  const [perPage, setPerPage] = useState(10)
+  const { data, loading, error, getDeviceData } = useDeviceData();
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
   useEffect(() => {
-    getDeviceData(deviceId, page, perPage)
+    getDeviceData(deviceId, page, perPage);
   }, [deviceId, page, perPage])
 
   const handlePageChange = (newPage: number) => {
-    setPage(newPage)
+    setPage(newPage);
   }
 
   const handlePerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setPerPage(Number(event.target.value))
-    setPage(1) // Reset to first page when changing items per page
+    setPerPage(Number(event.target.value));
+    setPage(1); // Reset to first page when changing items per page
   }
 
   if (loading) return <div>Loading...</div>
