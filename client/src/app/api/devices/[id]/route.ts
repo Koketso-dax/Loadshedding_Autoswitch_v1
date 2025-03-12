@@ -59,12 +59,9 @@ export async function POST(
     return NextResponse.json(data, { status });
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      return NextResponse.json(error.response.data, { status: error.response.status },  
-      );
+      return NextResponse.json(error.response.data);
     }
-    return NextResponse.json({ message: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ message: "Internal server error" });
   }
 }
 
@@ -91,16 +88,8 @@ export async function DELETE(
     return NextResponse.json(data, { status });
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      return NextResponse.json(
-        error.response.data,
-        {
-          status: error.response.status,
-        },
-      );
+      return NextResponse.json(error.response.data);
     }
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ message: "Internal server error" });
   }
 }

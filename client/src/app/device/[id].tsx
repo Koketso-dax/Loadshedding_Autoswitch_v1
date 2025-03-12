@@ -1,13 +1,13 @@
-import { useRouter } from 'next/router'
-import React from 'react'
-import DeviceDataDisplay from '../../components/DeviceDataDisplay'
+import { useRouter } from "next/router";
+import React from "react";
+import DeviceDataDisplay from "@/components/DeviceDataDisplay";
 
 export default function DeviceDataPage() {
-  const router = useRouter()
-  const { id } = router.query
+  const router = useRouter();
+  const { id } = router.query;
 
-  if (!id || typeof id !== 'string') {
-    return <div>Invalid device ID</div>
+  if (!id || typeof id !== "string") {
+    return <div>Invalid device ID</div>;
   }
 
   return (
@@ -15,5 +15,5 @@ export default function DeviceDataPage() {
       <h1>Device Data</h1>
       <DeviceDataDisplay deviceId={parseInt(id, 10)} />
     </div>
-  )
+  );
 }

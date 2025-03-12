@@ -5,27 +5,29 @@ interface DeviceDataDisplayProps {
   deviceId: number;
 }
 
-export default function DeviceDataDisplay({ deviceId }: DeviceDataDisplayProps) {
+export default function DeviceDataDisplay({
+  deviceId,
+}: DeviceDataDisplayProps) {
   const { data, loading, error, getDeviceData } = useDeviceData();
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
   useEffect(() => {
     getDeviceData(deviceId, page, perPage);
-  }, [deviceId, page, perPage])
+  }, [deviceId, page, perPage, getDeviceData]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-  }
+  };
 
   const handlePerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setPerPage(Number(event.target.value));
     setPage(1); // Reset to first page when changing items per page
-  }
+  };
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>Error: {error}</div>
-  if (!data) return <div>No data available</div>
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!data) return <div>No data available</div>;
 
   return (
     <div>
@@ -47,15 +49,17 @@ export default function DeviceDataDisplay({ deviceId }: DeviceDataDisplayProps) 
         </tbody>
       </table>
       <div>
-        <button 
-          onClick={() => handlePageChange(page - 1)} 
+        <button
+          onClick={() => handlePageChange(page - 1)}
           disabled={page === 1}
         >
           Previous
         </button>
-        <span>Page {page} of {data.pages}</span>
-        <button 
-          onClick={() => handlePageChange(page + 1)} 
+        <span>
+          Page {page} of {data.pages}
+        </span>
+        <button
+          onClick={() => handlePageChange(page + 1)}
           disabled={page === data.pages}
         >
           Next
@@ -67,5 +71,5 @@ export default function DeviceDataDisplay({ deviceId }: DeviceDataDisplayProps) 
         </select>
       </div>
     </div>
-  )
+  );
 }
